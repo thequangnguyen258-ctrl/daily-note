@@ -15,19 +15,175 @@ const SPIRIT_FRUITS = [
 ];
 
 const CORE_NEEDS = [
-  { id: 'anxiety', label: 'Bình An Trong Lo Âu', desc: 'Khi tâm trí ngổn ngang lo toan về cơm áo gạo tiền, sức khỏe hay ngày mai.', scripture: 'Chớ lo phiền chi hết, song trong mọi sự hãy dùng lời cầu nguyện... mà bày tỏ sự cầu xin lên Đức Chúa Trời.', ref: 'Phi-líp 4:6-7', x: 0.22, y: 0.33 },
-  { id: 'loneliness', label: 'Hiện Diện Khi Cô Đơn', desc: 'Cảm giác lạc lõng, trống vắng không ai thấu hiểu nỗi lòng riêng.', scripture: 'Ta sẽ chẳng lìa ngươi, chẳng bỏ ngươi đâu.', ref: 'Hê-bơ-rơ 13:5', x: 0.78, y: 0.33 },
-  { id: 'healing', label: 'Chữa Lành Tổn Thương', desc: 'Vết thương lòng do bị phản bội, ruồng bỏ, lời nói cay độc xâu xé.', scripture: 'Đức Giê-hô-va chữa lành những người có lòng đau thương và băng bó các vết tích của họ.', ref: 'Thi-thiên 147:3', x: 0.16, y: 0.44 },
-  { id: 'forgiveness', label: 'Giải Phóng Mặc Cảm Tội Lỗi', desc: 'Dằn vặt vì những sai lầm trong quá khứ, tự kết án bản thân.', scripture: 'Còn nếu chúng ta xưng tội mình, thì Ngài là thành tín công bình để tha tội cho chúng ta.', ref: '1 Giăng 1:9', x: 0.84, y: 0.44 },
-  { id: 'direction', label: 'Sự Soi Dẫn Khi Lạc Lối', desc: 'Đứng trước ngã rẽ cuộc đời không biết đi về đâu, thiếu sự khôn ngoan.', scripture: 'Lời Chúa là ngọn đèn cho chân tôi, ánh sáng cho đường lối tôi.', ref: 'Thi-thiên 119:105', x: 0.26, y: 0.25 },
-  { id: 'comfort', label: 'An Ủi Khi Tang Chế & Mất Mát', desc: 'Nỗi đau chia lìa, mất đi người thân yêu hoặc ước mơ sụp đổ.', scripture: 'Phước cho những kẻ than khóc, vì sẽ được an ủi!', ref: 'Ma-thi-ơ 5:4', x: 0.74, y: 0.25 },
-  { id: 'strength', label: 'Sức Mạnh Khi Kiệt Sức', desc: 'Gánh nặng công việc, chăm sóc gia đình đè nặng không còn sức lực.', scripture: 'Những ai trông đợi Đức Giê-hô-va chắc chắn được sức mới; cất cánh bay cao như chim ưng.', ref: 'Ê-sai 40:31', x: 0.50, y: 0.15 },
-  { id: 'provision', label: 'Tiếp Trợ Nhu Cầu Vật Chất', desc: 'Bế tắc tài chính, nợ nần, thiếu thốn chi phí sinh hoạt hàng ngày.', scripture: 'Đức Chúa Trời tôi sẽ làm cho đầy đủ mọi sự cần dùng của anh em theo sự giàu có của Ngài.', ref: 'Phi-líp 4:19', x: 0.38, y: 0.20 },
-  { id: 'reconciliation', label: 'Hòa Giải Mối Quan Hệ', desc: 'Xung đột vợ chồng, cha mẹ con cái bất hòa, bạn bè hiểu lầm xa cách.', scripture: 'Hãy hết sức mình tìm kiếm sự hòa thuận với mọi người.', ref: 'Rô-ma 12:18', x: 0.62, y: 0.20 },
-  { id: 'protection', label: 'Bảo Vệ Khỏi Ác Độc', desc: 'Sự sợ hãi trước những kẻ quấy nhiễu, nguy hiểm rình rập, điều dữ.', scripture: 'Đức Giê-hô-va sẽ gìn giữ ngươi khỏi mọi tai họa; Ngài sẽ bảo tồn linh hồn ngươi.', ref: 'Thi-thiên 121:7', x: 0.44, y: 0.36 },
-  { id: 'identity', label: 'Nhận Biết Giá Trị Bản Thân', desc: 'Tự ti, cảm thấy mình vô dụng, kém cỏi so với người khác.', scripture: 'Ngài đã chọn chúng ta trước khi sáng thế... Ngài gọi ngươi bằng tên ngươi; ngươi thuộc về Ta.', ref: 'Ê-phê-sô 1:4 / Ê-sai 43:1', x: 0.56, y: 0.36 },
-  { id: 'hope', label: 'Hy Vọng Cho Tương Lai', desc: 'Tuyệt vọng, thấy tương lai tăm tối mù mịt không lối thoát.', scripture: 'Vì Ta biết ý tưởng Ta nghĩ đối cùng các ngươi... là ý tưởng bình an, chẳng phải tai họa, để cho các ngươi được sự trông cậy trong lúc cuối cùng.', ref: 'Giê-rê-mi 29:11', x: 0.50, y: 0.37 },
-  { id: 'selfcontrol', label: 'Chiến Thắng Cám Dỗ', desc: 'Bị trói buộc bởi thói quen xấu, nghiện ngập, dục vọng thể xác.', scripture: 'Những sự cám dỗ đến cho anh em... Đức Chúa Trời là thành tín, chẳng hề để anh em bị cám dỗ quá sức mình đâu.', ref: '1 Cô-rinh-tô 10:13', x: 0.50, y: 0.46 }
+  {
+    id: 'need_loved',
+    label: 'Được Yêu Thương',
+    icon: '❤️',
+    wound: 'Bị bỏ bê, ít được thể hiện tình cảm hoặc chỉ được yêu khi đáp ứng kỳ vọng.',
+    belief: '“Mình phải làm gì đó mới đáng được yêu.”',
+    pattern: 'Có xu hướng làm hài lòng người khác, tìm kiếm sự công nhận bên ngoài.',
+    direction: 'Tình yêu đi trước mọi hành vi của con người (Tình yêu vô điều kiện của Đức Chúa Trời).',
+    scripture: 'Nhưng Đức Chúa Trời tỏ lòng yêu thương Ngài đối với chúng ta, khi chúng ta còn là người có tội, thì Đấng Christ vì chúng ta chịu chết.',
+    ref: 'Rô-ma 5:8',
+    comfort: 'Chúa đã yêu bạn bằng tình yêu vô điều kiện trước khi bạn làm được bất cứ điều gì.',
+    x: 0.22, y: 0.33
+  },
+  {
+    id: 'need_accepted',
+    label: 'Được Chấp Nhận',
+    icon: '🤝',
+    wound: 'Bị từ chối, chế giễu hoặc thường xuyên bị so sánh với người khác.',
+    belief: '“Nếu người khác biết con người thật của mình, họ sẽ bỏ mình.”',
+    pattern: 'Che giấu bản thân, đeo mặt nạ, people-pleasing, giả vờ hoàn hảo.',
+    direction: 'Được tiếp nhận không phải vì mình hoàn hảo mà bởi ân điển nhưng không.',
+    scripture: 'Vậy thì, anh em hãy tiếp nhận nhau, cũng như Đấng Christ đã tiếp nhận anh em, để Đức Chúa Trời được vinh hiển.',
+    ref: 'Rô-ma 15:7',
+    comfort: 'Đấng Christ đã tiếp nhận trọn vẹn con người thật của bạn vào lòng Ngài.',
+    x: 0.78, y: 0.33
+  },
+  {
+    id: 'need_belonging',
+    label: 'Được Thuộc Về',
+    icon: '🏡',
+    wound: 'Cô lập, bị nhóm bạn loại trừ hoặc gia đình thiếu sự gắn kết ấm áp.',
+    belief: '“Mình không thuộc về đâu cả, mình lạc lõng.”',
+    pattern: 'Bám víu quá mức vào một người hoặc ngược lại tự cô lập chính mình.',
+    direction: 'Cảm nhận mình thuộc về gia đình đời đời của Đức Chúa Trời.',
+    scripture: 'Dường ấy anh em chẳng phải là người ngoại, cũng chẳng phải là kẻ ở trọ nữa, nhưng là người đồng dân với các thánh đồ, và là người nhà của Đức Chúa Trời.',
+    ref: 'Ê-phê-sô 2:19',
+    comfort: 'Bạn không phải kẻ ở trọ hay người ngoài; bạn là thành viên quý báu trong nhà Chúa.',
+    x: 0.16, y: 0.44
+  },
+  {
+    id: 'need_seen',
+    label: 'Được Nhìn Nhận',
+    icon: '👁️',
+    wound: 'Bị phớt lờ, tiếng nói không được coi trọng trong quá khứ.',
+    belief: '“Mình không quan trọng, không ai nhìn thấy mình.”',
+    pattern: 'Cố gây chú ý quá mức hoặc hoàn toàn thu mình, bất cần.',
+    direction: 'Đức Chúa Trời biết và nhìn thấy tỏ tường con người thật cùng giá trị của mình.',
+    scripture: 'Hỡi Đức Giê-hô-va, Ngài đã dò xét tôi, và biết tôi. Khi tôi ngồi, lúc tôi đứng dậy, Chúa đều biết cả; từ xa Chúa hiểu biết ý tưởng tôi.',
+    ref: 'Thi-thiên 139:1-2',
+    comfort: 'Chúa thấu suốt mọi hành trình và nhìn thấy từng nỗi lòng thầm kín nhất của bạn.',
+    x: 0.84, y: 0.44
+  },
+  {
+    id: 'need_valued',
+    label: 'Có Giá Trị',
+    icon: '💎',
+    wound: 'Thường xuyên bị so sánh, tình yêu gắn với thành tích hoặc từng trải qua thất bại.',
+    belief: '“Giá trị của mình = thành tích và sự thành công.”',
+    pattern: 'Chủ nghĩa hoàn hảo hóa, ganh đua so sánh, hoặc tự khinh chê bản thân.',
+    direction: 'Giá trị của con người có trước mọi thành tích, do chính Chúa tạo dựng.',
+    scripture: 'Vì chúng ta là việc Ngài làm ra, đã được dựng nên trong Đức Chúa Jêsus Christ để làm việc lành mà Đức Chúa Trời đã sắm sẵn trước cho chúng ta làm theo.',
+    ref: 'Ê-phê-sô 2:10',
+    comfort: 'Bạn là kiệt tác nghệ thuật tuyệt hảo được chính bàn tay Chúa tạo tác.',
+    x: 0.26, y: 0.25
+  },
+  {
+    id: 'need_safe',
+    label: 'Được An Toàn',
+    icon: '🛡️',
+    wound: 'Trải qua bạo lực, môi trường bất ổn hoặc người chăm sóc có phản ứng khó đoán.',
+    belief: '“Thế giới này không an toàn, nguy hiểm rình rập.”',
+    pattern: 'Luôn cảnh giác cao độ, muốn kiểm soát mọi thứ xung quanh hoặc né tránh.',
+    direction: 'Sự khác biệt giữa kiểm soát và nương náu dưới bóng toàn năng của Chúa.',
+    scripture: 'Hỡi Đức Giê-hô-va, tôi sẽ nằm và ngủ bình an; vì chỉ một mình Ngài làm cho tôi được ở yên ổn.',
+    ref: 'Thi-thiên 4:8',
+    comfort: 'Chỉ duy nơi Chúa mới có sự yên ổn và bình an đích thực bảo bọc giấc ngủ bạn.',
+    x: 0.74, y: 0.25
+  },
+  {
+    id: 'need_protected',
+    label: 'Có Người Bảo Vệ',
+    icon: '🏰',
+    wound: 'Phải trưởng thành quá sớm, thiếu người nâng đỡ, gánh vác một mình.',
+    belief: '“Mình phải tự lo tất cả, không ai bảo vệ che chở cho mình.”',
+    pattern: 'Không dám nhờ giúp đỡ, luôn cố gồng gánh tự giải quyết mọi chuyện.',
+    direction: 'Cho phép bản thân yếu đuối và tìm nơi nương náu vững bền nơi Chúa.',
+    scripture: 'Đức Chúa Trời là nơi nương náu và sức lực của chúng tôi, Ngài sẵn giúp đỡ trong cơn gian truân.',
+    ref: 'Thi-thiên 46:1',
+    comfort: 'Bạn được phép yếu đuối trước mặt Chúa, vì Ngài chính là đồn lũy bảo vệ bạn.',
+    x: 0.50, y: 0.15
+  },
+  {
+    id: 'need_listened',
+    label: 'Được Lắng Nghe',
+    icon: '👂',
+    wound: 'Cảm xúc thường bị phủ nhận như “đừng khóc”, “có gì đâu mà buồn”, “chuyện nhỏ”.',
+    belief: '“Cảm xúc của mình không quan trọng, nói ra cũng vô ích.”',
+    pattern: 'Đè nén, kìm nén, né tránh hoặc không biết cách gọi tên cảm xúc thật.',
+    direction: 'Đức Chúa Trời trân quý và mời gọi con người giãi bày, dốc đổ lòng mình.',
+    scripture: 'Mắt Đức Giê-hô-va đoái xem người công bình, lỗ tai Ngài lắng nghe tiếng kêu cầu của họ... Đức Giê-hô-va ở gần những người có lòng đau thương.',
+    ref: 'Thi-thiên 34:15, 18',
+    comfort: 'Tai Chúa hằng lắng nghe từng tiếng thở dài và giọt nước mắt thầm kín của bạn.',
+    x: 0.38, y: 0.20
+  },
+  {
+    id: 'need_understood',
+    label: 'Được Thấu Hiểu',
+    icon: '🕊️',
+    wound: 'Thường xuyên bị hiểu lầm, phán xét hoặc áp đặt định kiến.',
+    belief: '“Không ai thực sự hiểu mình, chia sẻ ra chỉ thêm tổn thương.”',
+    pattern: 'Không chia sẻ, khép kín, giữ kín mọi suy nghĩ và nỗi đau trong lòng.',
+    direction: 'Một Đấng thấu hiểu tận cùng lòng dạ, cả những điều chưa thể thốt nên lời.',
+    scripture: 'Vì lời chưa ở trên lưỡi tôi, kìa, hỡi Đức Giê-hô-va, Ngài đã biết trọn hết rồi.',
+    ref: 'Thi-thiên 139:4',
+    comfort: 'Ngay cả khi bạn chưa biết cất lời ra sao, Chúa đã thấu hiểu tường tận cõi lòng bạn.',
+    x: 0.62, y: 0.20
+  },
+  {
+    id: 'need_rest',
+    label: 'Được Nghỉ Ngơi',
+    icon: '🌿',
+    wound: 'Quá tải, gánh trách nhiệm quá mức hoặc luôn phải tỏ ra mạnh mẽ.',
+    belief: '“Nếu mình dừng lại, mọi thứ sẽ sụp đổ; mình không được phép nghỉ.”',
+    pattern: 'Làm việc quá mức, khó thả lỏng, ám ảnh năng suất, dễ kiệt sức.',
+    direction: 'Giá trị bản thân không phụ thuộc vào năng suất; sự yên nghỉ thánh thiện trong Chúa.',
+    scripture: 'Hỡi những kẻ mệt mỏi và gánh nặng, hãy đến cùng ta, ta sẽ cho các ngươi được yên nghỉ.',
+    ref: 'Ma-thi-ơ 11:28',
+    comfort: 'Hãy hạ bớt những gánh nặng tự mang; Chúa trao cho bạn sự yên nghỉ thanh thản.',
+    x: 0.44, y: 0.36
+  },
+  {
+    id: 'need_forgiven',
+    label: 'Được Tha Thứ',
+    icon: '🕊️',
+    wound: 'Từng mắc sai lầm, phạm tội hoặc mang cảm giác xấu hổ, tội lỗi sâu sắc.',
+    belief: '“Mình là người xấu, không thể tha thứ, không xứng đáng được hạnh phúc.”',
+    pattern: 'Trốn tránh, che giấu, dằn vặt tự trách hoặc tự trừng phạt bản thân.',
+    direction: 'Sự khác biệt giữa tội lỗi và sự kết án; huyết Chúa tha thứ và tẩy sạch hoàn toàn.',
+    scripture: 'Còn nếu chúng ta xưng tội mình, thì Ngài là thành tín công bình để tha tội cho chúng ta, và làm cho chúng ta sạch mọi điều gian ác.',
+    ref: 'I Giăng 1:9',
+    comfort: 'Ân điển tha thứ của Chúa xóa sạch mọi vết nhơ và cho bạn một lương tâm trong sạch.',
+    x: 0.56, y: 0.36
+  },
+  {
+    id: 'need_restored',
+    label: 'Được Phục Hồi',
+    icon: '🌱',
+    wound: 'Thất bại nặng nề, sa ngã hoặc mất phương hướng hoàn toàn.',
+    belief: '“Mình đã hỏng rồi, không thể làm lại, cuộc đời coi như xong.”',
+    pattern: 'Buông xuôi, mất hy vọng, chán chường, không muốn bắt đầu lại.',
+    direction: 'Thất bại không phải là điểm kết thúc; Chúa là Đấng tái tạo và bù đắp bội phần.',
+    scripture: 'Đức Chúa Trời ôi! xin hãy dựng nên trong tôi một lòng trong sạch, và làm cho mới lại trong tôi một thần linh ngay thẳng.',
+    ref: 'Thi-thiên 51:10',
+    comfort: 'Chúa có quyền năng tái tạo một tâm linh hoàn toàn mới và tươi sáng trong bạn.',
+    x: 0.50, y: 0.37
+  },
+  {
+    id: 'need_free',
+    label: 'Được Tự Do',
+    icon: '🕊️',
+    wound: 'Bị kiểm soát ngột ngạt, chịu áp lực định kiến hoặc phải sống theo mong muốn của người khác.',
+    belief: '“Mình không được phép là chính mình, luôn bị trói buộc.”',
+    pattern: 'Nổi loạn cực đoan hoặc ngược lại phục tùng tuyệt đối trong cay đắng.',
+    direction: 'Sự tự do thật trong Chúa (không đồng nghĩa với phóng túng hay vô trách nhiệm).',
+    scripture: 'Chúa tức là Thánh Linh, nơi nào có Thánh Linh của Chúa, nơi đó có sự tự do.',
+    ref: 'II Cô-rinh-tô 3:17',
+    comfort: 'Thánh Linh Chúa mang lại cho bạn sự tự do và sự sống đích thực trong tâm hồn.',
+    x: 0.50, y: 0.46
+  }
 ];
 
 // 2. AUDIO SYNTHESIZER (528Hz & Water Sounds)
@@ -587,10 +743,14 @@ function openFruitModal(fruit) {
 function openLeafModal(leaf) {
   currentSelectedLeaf = leaf;
   audio.playBell(528);
+  document.getElementById('leaf-modal-icon').innerText = leaf.icon || '🍃';
   document.getElementById('leaf-modal-title').innerText = leaf.label;
-  document.getElementById('leaf-modal-desc').innerText = leaf.desc;
+  document.getElementById('leaf-modal-wound').innerText = leaf.wound;
+  document.getElementById('leaf-modal-belief').innerText = leaf.belief;
+  document.getElementById('leaf-modal-direction').innerText = leaf.direction;
   document.getElementById('leaf-modal-scripture').innerText = `"${leaf.scripture}"`;
   document.getElementById('leaf-modal-ref').innerText = leaf.ref;
+  document.getElementById('leaf-modal-comfort').innerText = leaf.comfort ? `💡 ${leaf.comfort}` : '';
   document.getElementById('leaf-modal').style.display = 'flex';
 }
 
@@ -825,11 +985,14 @@ function renderCoreNeedList() {
     const item = document.createElement('div');
     item.className = 'need-item';
     item.innerHTML = `
-      <div>
-        <div class="need-item-title">${n.label}</div>
-        <div class="need-item-sub">${n.desc}</div>
+      <div style="display:flex; align-items:center; gap:12px; flex:1;">
+        <span style="font-size:1.6rem; line-height:1;">${n.icon || '🍃'}</span>
+        <div style="flex:1;">
+          <div class="need-item-title" style="font-weight:600; color:#F8FAFC;">${n.label}</div>
+          <div class="need-item-sub" style="color:#94A3B8; font-size:0.85rem; margin-top:2px;">${n.direction}</div>
+        </div>
       </div>
-      <span>→</span>
+      <span style="color:#F59E0B; font-size:1.2rem; margin-left:8px;">→</span>
     `;
     item.addEventListener('click', () => openLeafModal(n));
     container.appendChild(item);
@@ -960,11 +1123,26 @@ async function sendChatMessage() {
 function generateBiblicalResponse(query) {
   const q = query.toLowerCase();
   for (let need of CORE_NEEDS) {
-    if (q.includes('lo') || q.includes('sợ') || q.includes('buồn') || q.includes('cô đơn') || q.includes('đau')) {
-      return `Chúa hiểu rõ nỗi lòng bạn lúc này. Lời Ngài hứa cùng bạn:\n"${need.scripture}" (${need.ref})\nHãy dâng gánh nặng này lên nơi chân Ngài.`;
+    if (
+      q.includes(need.label.toLowerCase()) ||
+      (need.id === 'need_loved' && (q.includes('yêu') || q.includes('bỏ rơi') || q.includes('cô đơn'))) ||
+      (need.id === 'need_accepted' && (q.includes('chấp nhận') || q.includes('từ chối') || q.includes('chê'))) ||
+      (need.id === 'need_belonging' && (q.includes('thuộc về') || q.includes('lạc lõng') || q.includes('bơ vơ'))) ||
+      (need.id === 'need_seen' && (q.includes('nhìn nhận') || q.includes('phớt lờ') || q.includes('vô hình'))) ||
+      (need.id === 'need_valued' && (q.includes('giá trị') || q.includes('kém cỏi') || q.includes('thất bại') || q.includes('so sánh'))) ||
+      (need.id === 'need_safe' && (q.includes('an toàn') || q.includes('bất an') || q.includes('sợ') || q.includes('lo'))) ||
+      (need.id === 'need_protected' && (q.includes('bảo vệ') || q.includes('tự lo') || q.includes('gánh vác') || q.includes('một mình'))) ||
+      (need.id === 'need_listened' && (q.includes('lắng nghe') || q.includes('khóc') || q.includes('buồn') || q.includes('im lặng'))) ||
+      (need.id === 'need_understood' && (q.includes('thấu hiểu') || q.includes('hiểu lầm') || q.includes('phán xét'))) ||
+      (need.id === 'need_rest' && (q.includes('nghỉ ngơi') || q.includes('mệt') || q.includes('kiệt sức') || q.includes('áp lực'))) ||
+      (need.id === 'need_forgiven' && (q.includes('tha thứ') || q.includes('tội') || q.includes('sai lầm') || q.includes('xấu hổ') || q.includes('dằn vặt'))) ||
+      (need.id === 'need_restored' && (q.includes('phục hồi') || q.includes('hỏng') || q.includes('làm lại') || q.includes('bế tắc'))) ||
+      (need.id === 'need_free' && (q.includes('tự do') || q.includes('trói buộc') || q.includes('kiểm soát') || q.includes('ngột ngạt')))
+    ) {
+      return `Hỡi con yêu dấu, Chúa thấu suốt cõi lòng con. ${need.direction}\n\nLời Ta phán cùng con hôm nay:\n"${need.scripture}" (${need.ref})\n\n💡 ${need.comfort}`;
     }
   }
-  return `Nguyện xin sự bình an của Chúa gìn giữ tâm hồn bạn. "Hãy trao mọi điều lo lắng mình cho Ngài, vì Ngài hay săn sóc anh em." (1 Phi-e-rơ 5:7)`;
+  return `Hỡi con yêu dấu, hãy trao mọi điều lo lắng của con lên nơi chân Chúa, vì Ngài hằng săn sóc con:\n"Đức Giê-hô-va là Đấng chăn giữ tôi: tôi sẽ chẳng thiếu thốn gì. Ngài khiến tôi an nghỉ nơi đồng cỏ xanh tươi, dẫn tôi đến mé nước bình tịnh." (Thi-thiên 23:1-2)\n\n💡 Nguyện xin sự bình an vượt quá mọi sự hiểu biết gìn giữ lòng và ý tưởng con trong Đấng Christ.`;
 }
 
 // 8. TAB 5: SETTINGS
