@@ -2005,3 +2005,16 @@ document.addEventListener('touchstart', () => {
 drawTree();
 resizeCanvas();
 renderCoreNeedList();
+
+// TỰ ĐỘNG XÓA NETLIFY BADGE / DRAWER INJECTION
+const killNetlifyBadge = () => {
+  const elements = document.querySelectorAll('iframe[src*="netlify"], iframe[id*="netlify"], [data-netlify-badge], netlify-drawer, #netlify-badge, .netlify-badge, [class*="netlify-feedback"], [id*="feedback-badge"]');
+  elements.forEach(el => {
+    try {
+      el.remove();
+    } catch {}
+  });
+};
+setInterval(killNetlifyBadge, 400);
+window.addEventListener('DOMContentLoaded', killNetlifyBadge);
+window.addEventListener('load', killNetlifyBadge);
