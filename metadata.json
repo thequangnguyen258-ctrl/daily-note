@@ -1,0 +1,6 @@
+{
+  "name": "Cây Sự Sống",
+  "description": "Nhật ký tĩnh nguyện, Cây Sự Sống 9 Trái Thánh Linh, 13 Chiếc Lá và âm thanh tần số chữa lành 528Hz.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

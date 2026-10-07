@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Nhật Ký Hàng Ngày</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#090614">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Nhật Ký">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="app-container">
+    <!-- 1. LOGIN SCREEN (DISGUISED AS DAILY JOURNAL) -->
+    <div id="login-screen" class="screen active">
+      <div class="login-wrapper">
+        <div class="emblem-card">
+          <span class="emblem-icon">📝</span>
+        </div>
+        <h1 class="login-title">NHẬT KÝ HÀNG NGÀY</h1>
+        <p class="login-sub">Sổ tay ghi chép cảm xúc & thói quen mỗi ngày</p>
+
+        <div class="login-card">
+          <h2 class="card-title">Đăng Nhập Sổ Tay</h2>
+          <p class="card-desc">Nhập tài khoản để mở khóa nhật ký riêng tư</p>
+
+          <div id="login-error" class="error-banner" style="display: none;"></div>
+
+          <div class="form-group">
+            <label for="login-username">Tên đăng nhập:</label>
+            <input type="text" id="login-username" placeholder="admin hoặc nguoidung1..." autocomplete="off">
+          </div>
+
+          <div class="form-group">
+            <label for="login-password">Mật khẩu:</label>
+            <div class="password-input-row">
+              <input type="password" id="login-password" placeholder="Mật khẩu của bạn...">
+              <button type="button" id="toggle-pwd-btn" class="icon-toggle-btn">👁️</button>
+            </div>
+          </div>
+
+          <button id="btn-login-submit" class="btn-primary">
+            <span>Đăng Nhập</span>
+            <span class="btn-arrow">→</span>
+          </button>
+        </div>
+
+        <div class="login-footer">
+          <p>🔒 Sổ Tay Cá Nhân Bảo Mật<br>Dữ liệu ghi chép được lưu trữ cục bộ riêng tư 100% trên thiết bị</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. MAIN APP CONTAINER (ACTIVATED AFTER LOGIN) -->
+    <div id="main-screen" class="screen">
+      <!-- TOP STATUS BAR -->
+      <header class="app-header">
+        <div class="user-badge" id="header-user-badge">
+          <span class="user-avatar">👤</span>
+          <div class="user-text">
+            <span class="user-name" id="display-user-name">@admin</span>
+            <span class="user-role" id="display-user-role">Quản trị viên</span>
+          </div>
+        </div>
+
+        <div class="header-right">
+          <button class="water-drops-badge" id="btn-pond-trigger" title="Mở Hồ Nước Sự Sống">
+            <span class="drop-icon">💧</span>
+            <span id="header-drops-count">0</span>
+          </button>
+          <button class="icon-btn" id="btn-open-settings" title="Cài đặt">⚙️</button>
+          <button class="icon-btn" id="btn-quick-logout" title="Đăng xuất">🚪</button>
+        </div>
+      </header>
+
+      <!-- TAB CONTENT VIEWPORT -->
+      <main class="content-viewport">
+        <!-- TAB 1: CÂY SỰ SỐNG -->
+        <section id="tab-tree" class="tab-pane active">
+          <!-- QUICK TEST BAR -->
+          <div class="quick-action-bar">
+            <button id="btn-toggle-weeds" class="action-chip">🥀 Có Gai/Cỏ</button>
+            <button id="btn-add-water" class="action-chip">💧 +100 Nước</button>
+            <button id="btn-test-watering" class="action-chip gold">👼 Đổ Bình Nước</button>
+            <button id="btn-test-fire" class="action-chip fire">🔥 Thả Hòn Lửa</button>
+          </div>
+
+          <!-- SACRED CANVAS -->
+          <div class="canvas-wrapper">
+            <canvas id="tree-canvas"></canvas>
+            <div id="animation-banner" class="animation-banner" style="display: none;"></div>
+          </div>
+
+          <!-- FOOTER LEGEND / QUICK GUIDE -->
+          <div class="tree-hint-card">
+            <div class="hint-row">
+              <span class="hint-dot gold"></span>
+              <span>Chạm <strong>Trái</strong>: Đọc Lời Chúa & Amen nhận Nước Sự Sống.</span>
+            </div>
+            <div class="hint-row">
+              <span class="hint-dot green"></span>
+              <span>Chạm <strong>Lá</strong>: 13 nhu cầu cảm xúc & sự an ủi từ Chúa.</span>
+            </div>
+            <div class="hint-row">
+              <span class="hint-dot brown"></span>
+              <span>Chạm <strong>Rễ</strong>: Bám rễ nơi dòng nước hằng sống.</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB 2: LỜI CHÚA & NAN ĐỀ -->
+        <section id="tab-scripture" class="tab-pane">
+          <div class="daily-verse-card">
+            <div class="verse-header">
+              <span>📖 LỜI CHÚA HÔM NAY (BẢN 1925)</span>
+            </div>
+            <p class="verse-quote" id="daily-scripture-quote">
+              "Người ấy sẽ như cây trồng gần dòng nước, sanh bông trái theo thì tiết, lá nó cũng chẳng tàn héo; mọi sự người làm đều sẽ thạnh vượng."
+            </p>
+            <p class="verse-ref" id="daily-scripture-ref">Thi-thiên 1:3</p>
+          </div>
+
+          <h3 class="section-title">13 Nan Đề Tâm Linh & Cảm Xúc</h3>
+          <div class="need-list" id="core-need-list"></div>
+        </section>
+
+        <!-- TAB 3: NHẬT KÝ TĨNH NGUYỆN -->
+        <section id="tab-journal" class="tab-pane">
+          <div class="journal-composer">
+            <h3 class="section-title">✍️ Viết Nhật Ký Hôm Nay</h3>
+            <div class="mood-selector">
+              <button class="mood-btn active" data-mood="Bình an">🕊️ Bình an</button>
+              <button class="mood-btn" data-mood="Biết ơn">🙏 Biết ơn</button>
+              <button class="mood-btn" data-mood="Lo lắng">🌧️ Lo lắng</button>
+              <button class="mood-btn" data-mood="Mỏi mệt">🥀 Mỏi mệt</button>
+              <button class="mood-btn" data-mood="Trông cậy">⚓ Trông cậy</button>
+            </div>
+            <input type="text" id="journal-title" placeholder="Tiêu đề nhật ký..." class="text-input">
+            <textarea id="journal-content" placeholder="Ghi lại những điều Chúa soi sáng, nỗi lòng của bạn hôm nay..." class="text-area" rows="4"></textarea>
+            <button id="btn-save-journal" class="btn-primary">Lưu Vào Nhật Ký (+1 Giọt Nước)</button>
+          </div>
+
+          <h3 class="section-title" style="margin-top: 20px;">Dòng Thời Gian Nhật Ký</h3>
+          <div id="journal-list" class="journal-list"></div>
+        </section>
+
+        <!-- TAB 4: PHÒNG CẦU NGUYỆN & AI AN ỦI -->
+        <section id="tab-prayer" class="tab-pane">
+          <div class="prayer-chat-container">
+            <div class="chat-intro-banner">
+              <span class="intro-icon">🕊️</span>
+              <div>
+                <strong>Người Đồng Hành Tĩnh Nguyện</strong>
+                <p>Kinh Thánh Bản 1925 & Lắng Nghe Mọi Nan Đề</p>
+              </div>
+            </div>
+
+            <div id="chat-messages" class="chat-messages"></div>
+
+            <div class="chat-input-row">
+              <input type="text" id="chat-input" placeholder="Tâm sự nỗi lòng hoặc xin câu Kinh Thánh..." autocomplete="off">
+              <button id="btn-send-chat" class="btn-send">Gửi</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB 5: CÀI ĐẶT & QUẢN TRỊ -->
+        <section id="tab-settings" class="tab-pane">
+          <div class="settings-card">
+            <h3>👤 Hồ Sơ Của Bạn</h3>
+            <p class="hint-text">Tên đăng nhập hệ thống: <strong id="settings-username">@admin</strong></p>
+            <div class="form-group">
+              <label>Tên hiển thị:</label>
+              <input type="text" id="settings-display-name" class="text-input">
+            </div>
+            <button id="btn-save-profile" class="btn-secondary">Lưu Tên Hiển Thị</button>
+          </div>
+
+          <!-- ADMIN USER MANAGEMENT -->
+          <div id="admin-management-card" class="settings-card" style="display: none;">
+            <h3>👑 Quản Trị Thành Viên</h3>
+            <p class="hint-text">Thêm username mới (Mật khẩu mặc định: 12345678):</p>
+            <div class="input-row">
+              <input type="text" id="new-member-username" placeholder="username mới..." class="text-input">
+              <button id="btn-add-member" class="btn-secondary">Thêm</button>
+            </div>
+            <div id="admin-member-list" class="member-list"></div>
+          </div>
+
+          <!-- GEMINI API KEY -->
+          <div class="settings-card">
+            <h3>🔑 Google Gemini API Key (Tùy chọn)</h3>
+            <p class="hint-text">Nếu để trống, ứng dụng sẽ dùng bộ máy suy luận Kinh Thánh 1925 ngoại tuyến 100%.</p>
+            <input type="password" id="settings-gemini-key" placeholder="AIzaSy..." class="text-input">
+            <button id="btn-save-gemini-key" class="btn-secondary" style="margin-top: 8px;">Lưu API Key</button>
+          </div>
+
+          <!-- BACKUP & EXPORT -->
+          <div class="settings-card">
+            <h3>💾 Sao Lưu Dữ Liệu</h3>
+            <button id="btn-export-json" class="btn-secondary">Sao Chép File JSON Sao Lưu</button>
+          </div>
+
+          <!-- LOGOUT -->
+          <button id="btn-settings-logout" class="btn-danger">Đăng Xuất Khỏi Tài Khoản</button>
+        </section>
+      </main>
+
+      <!-- BOTTOM NAVIGATION BAR -->
+      <nav class="bottom-nav">
+        <button class="nav-item active" data-tab="tab-tree">
+          <span class="nav-icon">🌳</span>
+          <span class="nav-label">Cây Thánh</span>
+        </button>
+        <button class="nav-item" data-tab="tab-scripture">
+          <span class="nav-icon">📖</span>
+          <span class="nav-label">Lời Chúa</span>
+        </button>
+        <button class="nav-item" data-tab="tab-journal">
+          <span class="nav-icon">✍️</span>
+          <span class="nav-label">Nhật Ký</span>
+        </button>
+        <button class="nav-item" data-tab="tab-prayer">
+          <span class="nav-icon">🕊️</span>
+          <span class="nav-label">Cầu Nguyện</span>
+        </button>
+        <button class="nav-item" data-tab="tab-settings">
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-label">Cài Đặt</span>
+        </button>
+      </nav>
+    </div>
+
+    <!-- 3. MODALS -->
+    <!-- MODAL: FRUIT OF THE SPIRIT -->
+    <div id="fruit-modal" class="modal-backdrop" style="display: none;">
+      <div class="modal-card">
+        <div class="modal-icon-badge" id="fruit-modal-icon">🍇</div>
+        <h3 id="fruit-modal-title" class="modal-title">Trái Thánh Linh</h3>
+        <p id="fruit-modal-meaning" class="modal-text"></p>
+        <div class="scripture-quote-box">
+          <p id="fruit-modal-scripture" class="scripture-quote"></p>
+          <span id="fruit-modal-ref" class="scripture-ref"></span>
+        </div>
+        <div class="modal-actions">
+          <button id="btn-amen-fruit" class="btn-primary gold">Amen! Nhận Lời Hứa (+1 Giọt Nước)</button>
+          <button id="btn-close-fruit-modal" class="btn-text">Đóng</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: CORE NEED LEAF -->
+    <div id="leaf-modal" class="modal-backdrop" style="display: none;">
+      <div class="modal-card">
+        <div class="modal-icon-badge">🍃</div>
+        <h3 id="leaf-modal-title" class="modal-title">Chiếc Lá Chữa Lành</h3>
+        <p id="leaf-modal-desc" class="modal-text"></p>
+        <div class="scripture-quote-box">
+          <p id="leaf-modal-scripture" class="scripture-quote"></p>
+          <span id="leaf-modal-ref" class="scripture-ref"></span>
+        </div>
+        <div class="modal-actions">
+          <button id="btn-amen-leaf" class="btn-primary">Amen! Được Chữa Lành (+1 Giọt Nước)</button>
+          <button id="btn-close-leaf-modal" class="btn-text">Đóng</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: ROOT DETAIL -->
+    <div id="root-modal" class="modal-backdrop" style="display: none;">
+      <div class="modal-card">
+        <div class="modal-icon-badge">🪵</div>
+        <h3 class="modal-title">Bộ Rễ Đức Tin & Nền Tảng</h3>
+        <p class="modal-text">Rễ cây đại diện cho việc bám rễ sâu vào Lời Chúa nơi dòng nước hằng sống để không sợ nắng hạn.</p>
+        <div class="scripture-quote-box">
+          <p class="scripture-quote">"Người ấy sẽ như cây trồng nơi bờ suối, đâm rễ theo dòng nước chảy; ngộ khi trời nắng chẳng hề sợ hãi, lá cứ xanh tươi."</p>
+          <span class="scripture-ref">Giê-rê-mi 17:8</span>
+        </div>
+        <div class="modal-actions">
+          <button id="btn-amen-root" class="btn-primary gold">Amen! Đâm Rễ Sâu (+1 Giọt Nước)</button>
+          <button id="btn-close-root-modal" class="btn-text">Đóng</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: MIRACLE POND (ANGEL WATER & HOLY FIRE) -->
+    <div id="pond-modal" class="modal-backdrop" style="display: none;">
+      <div class="modal-card">
+        <div class="modal-icon-badge">🌊</div>
+        <h3 class="modal-title">Hồ Nước Sự Sống Phép Lạ</h3>
+        <p class="modal-text">Hiện bạn có: <strong id="pond-current-drops">0</strong> giọt nước sự sống.</p>
+        <div class="pond-options">
+          <button id="btn-pond-resurrect" class="pond-action-btn water">
+            <span class="pond-btn-icon">👼</span>
+            <div>
+              <strong>Thiên Sứ Cầm Bình Đổ Nước</strong>
+              <p>Tưới đẫm đất cằn & làm tan biến hoàn toàn sỏi đá chặn rễ (-100 giọt nước)</p>
+            </div>
+          </button>
+          <button id="btn-pond-holy-fire" class="pond-action-btn fire">
+            <span class="pond-btn-icon">🔥</span>
+            <div>
+              <strong>Thiên Sứ Thả Hòn Lửa Thánh</strong>
+              <p>Thiêu đốt sạch cỏ lùng và bụi gai quấn quanh gốc (-100 giọt nước)</p>
+            </div>
+          </button>
+        </div>
+        <button id="btn-close-pond-modal" class="btn-text" style="margin-top: 14px;">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

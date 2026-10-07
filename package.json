@@ -1,0 +1,10 @@
+{
+  "name": "cay-su-song",
+  "version": "1.0.0",
+  "description": "Cây Sự Sống - Nhật Ký Hàng Ngày",
+  "scripts": {
+    "dev": "node web/server.js",
+    "start": "node web/server.js",
+    "lint": "echo ok"
+  }
+}

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Heavenly Dove at top -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,23 C52,21 47,21 44,23 C47,24 51,25 54,26 C57,25 61,24 64,23 C61,21 56,21 54,23 Z" />
+    <path
+        android:fillColor="#E0F2FE"
+        android:pathData="M54,24 C53,26 53,28 54,29 C55,28 55,26 54,24 Z" />
+
+    <!-- Tree Canopy Foliage -->
+    <!-- Base crown -->
+    <path
+        android:fillColor="#059669"
+        android:pathData="M54,34 C44,34 36,41 36,50 C36,53 37,56 39,58 C35,60 33,64 34,68 C35,72 39,75 44,75 C46,75 48,74 50,73 C51,75 52.5,76 54,76 C55.5,76 57,75 58,73 C60,74 62,75 64,75 C69,75 73,72 74,68 C75,64 73,60 69,58 C71,56 72,53 72,50 C72,41 64,34 54,34 Z" />
+
+    <!-- Inner vibrant highlights -->
+    <path
+        android:fillColor="#10B981"
+        android:pathData="M54,37 C46,37 40,43 40,51 C40,54 41,56 43,58 C40,60 38,63 39,66 C40,70 43,72 47,72 C49,72 51,71 52,70 C53,71 54,71.5 54,71.5 C54,71.5 55,71 56,70 C57,71 59,72 61,72 C65,72 68,70 69,66 C70,63 68,60 65,58 C67,56 68,54 68,51 C68,43 62,37 54,37 Z" />
+
+    <path
+        android:fillColor="#34D399"
+        android:pathData="M54,40 C48,40 43,45 43,51 C43,54 44.5,56 46,57 C44,59 43,62 44,64 C45,67 48,68 51,68 C52.5,68 53.5,67 54,66 C54.5,67 55.5,68 57,68 C60,68 63,67 64,64 C65,62 64,59 62,57 C63.5,56 65,54 65,51 C65,45 60,40 54,40 Z" />
+
+    <!-- Tree Trunk and Main Branches -->
+    <path
+        android:fillColor="#78350F"
+        android:pathData="M52,56 C52,56 46,52 42,49 C42,50 47,54 52,58 L52,75 C50,76 45,77 42,80 L43,81 C46,78 50,77 52,76 L52,82 L53.5,82 L53.5,76 L54.5,76 L54.5,82 L56,82 L56,76 C58,77 62,78 65,81 L66,80 C63,77 58,76 56,75 L56,58 C61,54 66,50 66,49 C62,52 56,56 56,56 L56,52 C58,49 61,46 61,45 C58,47 56,50 55,51 L55,47 C55,45 54,43 54,43 C54,43 53,45 53,47 L53,51 C52,50 50,47 47,45 C47,46 50,49 52,52 Z" />
+
+    <!-- Deep Roots -->
+    <path
+        android:strokeColor="#B45309"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M54,76 Q51,80 47,84" />
+    <path
+        android:strokeColor="#B45309"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M54,76 Q57,80 61,84" />
+    <path
+        android:strokeColor="#D97706"
+        android:strokeWidth="1.2"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M54,77 L54,85" />
+    <path
+        android:strokeColor="#D97706"
+        android:strokeWidth="1"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M51,79 Q46,82 43,84" />
+    <path
+        android:strokeColor="#D97706"
+        android:strokeWidth="1"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M57,79 Q62,82 65,84" />
+
+    <!-- 9 Fruits of the Holy Spirit (Radiant Gems) -->
+    <!-- 1. Yêu Thương (Love - Red) -->
+    <path android:fillColor="#F43F5E" android:pathData="M54,44m-2.8,0a2.8,2.8 0 1,1 5.6,0a2.8,2.8 0 1,1 -5.6,0" />
+    <!-- 2. Vui Mừng (Joy - Gold) -->
+    <path android:fillColor="#FACC15" android:pathData="M46,47m-2.6,0a2.6,2.6 0 1,1 5.2,0a2.6,2.6 0 1,1 -5.2,0" />
+    <!-- 3. Bình An (Peace - Cyan) -->
+    <path android:fillColor="#06B6D4" android:pathData="M62,47m-2.6,0a2.6,2.6 0 1,1 5.2,0a2.6,2.6 0 1,1 -5.2,0" />
+    <!-- 4. Nhịn Nhục (Patience - Emerald) -->
+    <path android:fillColor="#10B981" android:pathData="M40,54m-2.5,0a2.5,2.5 0 1,1 5,0a2.5,2.5 0 1,1 -5,0" />
+    <!-- 5. Nhân Từ (Kindness - Rose) -->
+    <path android:fillColor="#EC4899" android:pathData="M68,54m-2.5,0a2.5,2.5 0 1,1 5,0a2.5,2.5 0 1,1 -5,0" />
+    <!-- 6. Hiền Lành (Goodness - Blue) -->
+    <path android:fillColor="#3B82F6" android:pathData="M45,61m-2.5,0a2.5,2.5 0 1,1 5,0a2.5,2.5 0 1,1 -5,0" />
+    <!-- 7. Trung Tín (Faithfulness - Purple) -->
+    <path android:fillColor="#8B5CF6" android:pathData="M63,61m-2.5,0a2.5,2.5 0 1,1 5,0a2.5,2.5 0 1,1 -5,0" />
+    <!-- 8. Mềm Mại (Gentleness - Teal) -->
+    <path android:fillColor="#14B8A6" android:pathData="M54,53m-2.5,0a2.5,2.5 0 1,1 5,0a2.5,2.5 0 1,1 -5,0" />
+    <!-- 9. Tiết Độ (Self-control - Orange) -->
+    <path android:fillColor="#F97316" android:pathData="M54,63m-2.5,0a2.5,2.5 0 1,1 5,0a2.5,2.5 0 1,1 -5,0" />
+
+    <!-- Sparkles of Divine Light -->
+    <path
+        android:fillColor="#FEF08A"
+        android:pathData="M35,36 L36,39 L39,40 L36,41 L35,44 L34,41 L31,40 L34,39 Z" />
+    <path
+        android:fillColor="#FEF08A"
+        android:pathData="M73,36 L74,39 L77,40 L74,41 L73,44 L72,41 L69,40 L72,39 Z" />
+    <path
+        android:fillColor="#67E8F9"
+        android:pathData="M54,16 L54.7,18 L57,18.7 L54.7,19.4 L54,21.5 L53.3,19.4 L51,18.7 L53.3,18 Z" />
+
+</vector>

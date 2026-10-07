@@ -1,0 +1,16 @@
+{
+  "name": "Nhật Ký Hàng Ngày",
+  "short_name": "Nhật Ký",
+  "description": "Sổ tay ghi chép cảm xúc & thói quen mỗi ngày",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#090614",
+  "theme_color": "#090614",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}
