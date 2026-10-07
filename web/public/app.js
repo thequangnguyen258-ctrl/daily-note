@@ -1846,11 +1846,29 @@ document.getElementById('btn-export-json').addEventListener('click', () => {
   }
   const str = JSON.stringify(all, null, 2);
   navigator.clipboard.writeText(str).then(() => {
-    alert('Đã sao chép toàn bộ dữ liệu JSON vào bộ nhớ đệm!');
+    alert('Đã sao chép toàn bộ dữ liệu JSON vào bộ nhớ đệm!\nBạn có thể dán (paste) để lưu trữ hoặc gửi sang máy khác.');
   }).catch(() => {
     alert('Vui lòng cấp quyền sao chép.');
   });
 });
+
+const btnImportJson = document.getElementById('btn-import-json');
+if (btnImportJson) {
+  btnImportJson.addEventListener('click', () => {
+    const raw = prompt('Dán toàn bộ nội dung JSON sao lưu vào đây để khôi phục:');
+    if (!raw) return;
+    try {
+      const obj = JSON.parse(raw.trim());
+      Object.keys(obj).forEach(k => {
+        localStorage.setItem(k, obj[k]);
+      });
+      alert('Khôi phục dữ liệu thành công! Trang web sẽ tự tải lại để cập nhật.');
+      window.location.reload();
+    } catch (e) {
+      alert('Dữ liệu JSON không hợp lệ. Vui lòng kiểm tra lại.');
+    }
+  });
+}
 
 // LOGOUT
 function logout() {

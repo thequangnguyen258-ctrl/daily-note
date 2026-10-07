@@ -273,8 +273,12 @@
 
           <!-- BACKUP & EXPORT -->
           <div class="settings-card">
-            <h3>💾 Sao Lưu Dữ Liệu</h3>
-            <button id="btn-export-json" class="btn-secondary">Sao Chép File JSON Sao Lưu</button>
+            <h3>💾 Sao Lưu & Khôi Phục Dữ Liệu</h3>
+            <p class="hint-text">Dữ liệu được lưu trữ tự động trên thiết bị này. Bạn có thể sao lưu hoặc khôi phục sang thiết bị khác bất cứ lúc nào:</p>
+            <div style="display:flex; flex-direction:column; gap:8px; margin-top:10px;">
+              <button id="btn-export-json" class="btn-secondary">📋 Sao Chép File JSON Sao Lưu</button>
+              <button id="btn-import-json" class="btn-secondary" style="border-color:rgba(56,189,248,0.4); color:#38BDF8;">📥 Khôi Phục Dữ Liệu Từ JSON</button>
+            </div>
           </div>
 
           <!-- LOGOUT -->
