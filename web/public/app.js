@@ -765,10 +765,19 @@ function drawTree() {
     const fy = h * f.y;
     const isAmen = uData.amenFruits && uData.amenFruits.includes(f.id);
 
-    ctx.fillStyle = isAmen ? 'rgba(254, 240, 138, 0.45)' : 'rgba(255, 255, 255, 0.15)';
-    ctx.beginPath();
-    ctx.arc(fx, fy, 16, 0, Math.PI * 2);
-    ctx.fill();
+    // Glowing aura
+    if (isAmen) {
+      const auraPulse = (Math.sin(tick * 3 + f.x * 10) * 0.25 + 0.45);
+      ctx.fillStyle = `rgba(254, 240, 138, ${auraPulse})`;
+      ctx.beginPath();
+      ctx.arc(fx, fy, 18, 0, Math.PI * 2);
+      ctx.fill();
+    } else {
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.12)';
+      ctx.beginPath();
+      ctx.arc(fx, fy, 15, 0, Math.PI * 2);
+      ctx.fill();
+    }
 
     ctx.fillStyle = isAmen ? '#F59E0B' : f.color;
     ctx.beginPath();
@@ -786,6 +795,15 @@ function drawTree() {
     const lx = w * l.x;
     const ly = h * l.y;
     const isAmen = uData.amenLeaves && uData.amenLeaves.includes(l.id);
+
+    // Subtle glow if Amen-ed or active
+    if (isAmen) {
+      const leafGlow = (Math.sin(tick * 2.5 + l.x * 8) * 0.25 + 0.4);
+      ctx.fillStyle = `rgba(110, 231, 183, ${leafGlow})`;
+      ctx.beginPath();
+      ctx.arc(lx, ly, 10, 0, Math.PI * 2);
+      ctx.fill();
+    }
 
     ctx.fillStyle = isAmen ? '#6EE7B7' : '#059669';
     ctx.beginPath();
@@ -1047,6 +1065,57 @@ canvas.addEventListener('click', (e) => {
   }
 });
 
+// --- 10-DAY INNER REFLECTIONS & SPIRITUAL TRACKER ---
+function get10DayCutoff() {
+  return Date.now() - (10 * 24 * 60 * 60 * 1000);
+}
+
+function getRecent10DayJournals(uData) {
+  if (!uData || !uData.journals) return [];
+  const cutoff = get10DayCutoff();
+  return uData.journals.filter(j => !j.createdAt || j.createdAt >= cutoff);
+}
+
+function getRecent10DayChats(uData) {
+  if (!uData || !uData.chats) return [];
+  const cutoff = get10DayCutoff();
+  return uData.chats.filter(c => c.role === 'user' && (!c.createdAt || c.createdAt >= cutoff));
+}
+
+function getNeedKeywordsList(needId) {
+  const map = {
+    need_loved: ['yêu', 'bỏ rơi', 'cô đơn', 'tình cảm', 'quan tâm', 'hắt hủi'],
+    need_accepted: ['chấp nhận', 'từ chối', 'chê', 'phán xét', 'so sánh', 'mặt nạ', 'hoàn hảo'],
+    need_belonging: ['thuộc về', 'lạc lõng', 'bơ vơ', 'cô lập', 'gia đình', 'xa lạ'],
+    need_seen: ['nhìn nhận', 'phớt lờ', 'vô hình', 'quan trọng', 'chú ý', 'coi thường'],
+    need_valued: ['giá trị', 'thành tích', 'kém cỏi', 'thất bại', 'tự ti', 'vô dụng'],
+    need_safe: ['an toàn', 'bất an', 'sợ', 'lo lắng', 'hoảng', 'bất ổn', 'nguy hiểm'],
+    need_protected: ['bảo vệ', 'che chở', 'tự lo', 'gánh vác', 'một mình', 'bơ vơ'],
+    need_listened: ['lắng nghe', 'khóc', 'buồn', 'im lặng', 'chia sẻ', 'nỗi lòng', 'cô độc'],
+    need_understood: ['thấu hiểu', 'hiểu lầm', 'oan', 'phán xét', 'áp đặt'],
+    need_rest: ['nghỉ ngơi', 'mệt', 'kiệt sức', 'áp lực', 'quá tải', 'đuối', 'căng thẳng'],
+    need_forgiven: ['tha thứ', 'tội lỗi', 'sai lầm', 'xấu hổ', 'dằn vặt', 'ân hận', 'tội lỗi'],
+    need_restored: ['phục hồi', 'hỏng', 'đổ vỡ', 'làm lại', 'bế tắc', 'tái sinh', 'chữa lành'],
+    need_free: ['tự do', 'trói buộc', 'kiểm soát', 'ngột ngạt', 'gông cùm', 'ép buộc']
+  };
+  return map[needId] || [];
+}
+
+function getFruitKeywordsList(fruitId) {
+  const map = {
+    love: ['yêu thương', 'tình yêu', 'tha thứ', 'bao dung', 'yêu'],
+    joy: ['vui mừng', 'niềm vui', 'hân hoan', 'biết ơn', 'tạ ơn', 'vui vẻ'],
+    peace: ['bình an', 'yên lặng', 'thanh thản', 'nghỉ ngơi', 'nhẹ lòng', 'an yên'],
+    patience: ['nhịn nhục', 'kiên nhẫn', 'chờ đợi', 'kiên trì', 'chịu đựng'],
+    kindness: ['nhân từ', 'thương xót', 'tử tế', 'sẻ chia', 'giúp đỡ'],
+    goodness: ['hiền lành', 'lương thiện', 'ngay thẳng', 'việc lành'],
+    faithfulness: ['trung tín', 'trung thực', 'vững tin', 'son sắt', 'cam kết'],
+    gentleness: ['mềm mại', 'nhu mì', 'khiêm nhường', 'hạ mình'],
+    selfcontrol: ['tiết độ', 'làm chủ', 'kiềm chế', 'kỷ luật', 'tỉnh thức']
+  };
+  return map[fruitId] || [];
+}
+
 // MODAL CONTROLLERS
 let currentSelectedFruit = null;
 let currentSelectedLeaf = null;
@@ -1058,6 +1127,42 @@ function openFruitModal(fruit) {
   document.getElementById('fruit-modal-meaning').innerText = fruit.meaning;
   document.getElementById('fruit-modal-scripture').innerText = `"${fruit.scripture}"`;
   document.getElementById('fruit-modal-ref').innerText = fruit.ref;
+
+  // Render 10-day reflection history for this fruit
+  const container = document.getElementById('fruit-modal-recent-thoughts');
+  if (container && currentUser) {
+    const uData = store.getUserData(currentUser.username);
+    const journals = getRecent10DayJournals(uData);
+    const chats = getRecent10DayChats(uData);
+    const keywords = getFruitKeywordsList(fruit.id);
+    const isAmen = uData.amenFruits && uData.amenFruits.includes(fruit.id);
+
+    const matches = [];
+    journals.forEach(j => {
+      const txt = `${j.title} ${j.content} ${j.mood || ''}`.toLowerCase();
+      if (keywords.some(k => txt.includes(k)) || (j.mood && j.mood.toLowerCase().includes(fruit.name.toLowerCase()))) {
+        matches.push({ type: '✍️ Nhật ký', date: j.date, snippet: `"${j.title}": ${j.content.slice(0, 75)}...` });
+      }
+    });
+
+    chats.forEach(c => {
+      const txt = (c.text || '').toLowerCase();
+      if (keywords.some(k => txt.includes(k))) {
+        matches.push({ type: '🕊️ Tâm sự', date: 'Gần đây', snippet: c.text.slice(0, 80) + '...' });
+      }
+    });
+
+    if (matches.length > 0) {
+      container.innerHTML = matches.slice(0, 3).map(m => `
+        <div style="background:rgba(255,255,255,0.06); padding:6px 8px; border-radius:6px; margin-bottom:4px; font-size:0.8rem;">
+          <strong style="color:#FDE047;">${m.type} (${m.date}):</strong> ${m.snippet}
+        </div>
+      `).join('') + (isAmen ? `<p style="color:#6EE7B7; margin-top:4px; font-size:0.8rem;">✨ Bạn đã Amen nhận quả ngọt này!</p>` : '');
+    } else {
+      container.innerHTML = `<p style="color:#94A3B8; font-style:italic;">${isAmen ? '✨ Bạn đã Amen gieo hạt giống này trong 10 ngày qua.' : 'Chưa có ghi chép nổi bật về Trái này trong 10 ngày qua. Hãy bấm Amen bên dưới để nuôi dưỡng tâm hồn!'}</p>`;
+    }
+  }
+
   document.getElementById('fruit-modal').style.display = 'flex';
 }
 
@@ -1072,11 +1177,84 @@ function openLeafModal(leaf) {
   document.getElementById('leaf-modal-scripture').innerText = `"${leaf.scripture}"`;
   document.getElementById('leaf-modal-ref').innerText = leaf.ref;
   document.getElementById('leaf-modal-comfort').innerText = leaf.comfort ? `💡 ${leaf.comfort}` : '';
+
+  // Render 10-day inner needs history for this leaf
+  const container = document.getElementById('leaf-modal-recent-thoughts');
+  if (container && currentUser) {
+    const uData = store.getUserData(currentUser.username);
+    const journals = getRecent10DayJournals(uData);
+    const chats = getRecent10DayChats(uData);
+    const keywords = getNeedKeywordsList(leaf.id);
+    const isAmen = uData.amenLeaves && uData.amenLeaves.includes(leaf.id);
+
+    const matches = [];
+    journals.forEach(j => {
+      const txt = `${j.title} ${j.content}`.toLowerCase();
+      if (keywords.some(k => txt.includes(k)) || txt.includes(leaf.label.toLowerCase())) {
+        matches.push({ type: '✍️ Nhật ký', date: j.date, snippet: `"${j.title}": ${j.content.slice(0, 75)}...` });
+      }
+    });
+
+    chats.forEach(c => {
+      const txt = (c.text || '').toLowerCase();
+      if (keywords.some(k => txt.includes(k)) || txt.includes(leaf.label.toLowerCase())) {
+        matches.push({ type: '🕊️ Tâm sự', date: 'Gần đây', snippet: c.text.slice(0, 80) + '...' });
+      }
+    });
+
+    if (matches.length > 0) {
+      container.innerHTML = matches.slice(0, 3).map(m => `
+        <div style="background:rgba(255,255,255,0.06); padding:6px 8px; border-radius:6px; margin-bottom:4px; font-size:0.8rem;">
+          <strong style="color:#6EE7B7;">${m.type} (${m.date}):</strong> ${m.snippet}
+        </div>
+      `).join('') + `<p style="color:#FDE047; margin-top:4px; font-size:0.8rem;">💡 Chúa nhìn thấy nỗi lòng này của bạn trong 10 ngày qua và Ngài đang chữa lành.</p>`;
+    } else {
+      container.innerHTML = `<p style="color:#94A3B8; font-style:italic;">${isAmen ? '✨ Bạn đã Amen tiếp nhận sự chữa lành cho nhu cầu này.' : 'Trong 10 ngày qua, bạn chưa ghi lại nan đề nào liên quan đến nhu cầu này. Nguyện Chúa luôn bảo bọc bạn trong bình an!'}</p>`;
+    }
+  }
+
   document.getElementById('leaf-modal').style.display = 'flex';
 }
 
 function openRootModal() {
   audio.playBell(528);
+  
+  // Render 10-day spiritual root depth summary
+  const container = document.getElementById('root-modal-recent-thoughts');
+  if (container && currentUser) {
+    const uData = store.getUserData(currentUser.username);
+    const journals = getRecent10DayJournals(uData);
+    const chats = getRecent10DayChats(uData);
+    
+    // Calculate need frequencies
+    const needCounts = {};
+    CORE_NEEDS.forEach(n => {
+      const kws = getNeedKeywordsList(n.id);
+      let count = 0;
+      journals.forEach(j => {
+        const txt = `${j.title} ${j.content}`.toLowerCase();
+        if (kws.some(k => txt.includes(k))) count++;
+      });
+      chats.forEach(c => {
+        const txt = (c.text || '').toLowerCase();
+        if (kws.some(k => txt.includes(k))) count++;
+      });
+      if (count > 0) needCounts[n.label] = count;
+    });
+
+    const topNeeds = Object.entries(needCounts).sort((a, b) => b[1] - a[1]).slice(0, 3);
+    const topNeedsStr = topNeeds.length > 0 ? topNeeds.map(([k, v]) => `<strong>${k}</strong> (${v} lần)`).join(', ') : 'Chưa có nan đề nổi cộm';
+
+    container.innerHTML = `
+      <div style="display:flex; flex-direction:column; gap:4px; font-size:0.8rem;">
+        <div>📝 <strong>Nhật ký 10 ngày qua:</strong> ${journals.length} bài viết</div>
+        <div>🕊️ <strong>Tâm sự với Chúa:</strong> ${chats.length} lần dốc đổ nỗi lòng</div>
+        <div>🩹 <strong>Nội tâm được chạm đến nhiều nhất:</strong> ${topNeedsStr}</div>
+        <div>💧 <strong>Dòng Nước Ân Điển:</strong> Đang tích lũy ${uData.waterDrops || 0} giọt nước sự sống</div>
+      </div>
+    `;
+  }
+
   document.getElementById('root-modal').style.display = 'flex';
 }
 
@@ -1382,6 +1560,7 @@ document.getElementById('btn-save-journal').addEventListener('click', () => {
     title,
     content,
     mood: selectedMood,
+    createdAt: Date.now(),
     date: new Date().toLocaleDateString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' })
   });
   updateNegativeState(uData);
@@ -1446,7 +1625,7 @@ async function sendChatMessage() {
 
   const uData = store.getUserData(currentUser.username);
   uData.waterDrops = (uData.waterDrops || 0) + 20; // +20 Giọt nước khi tâm sự
-  uData.chats.push({ role: 'user', text });
+  uData.chats.push({ role: 'user', text, createdAt: Date.now() });
   updateNegativeState(uData);
   updateHeaderDrops();
   renderChat();
