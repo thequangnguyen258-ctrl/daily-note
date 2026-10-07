@@ -26,7 +26,14 @@
         <h1 class="login-title">NHẬT KÝ HÀNG NGÀY</h1>
         <p class="login-sub">Sổ tay ghi chép cảm xúc & thói quen mỗi ngày</p>
 
-        <div class="login-card">
+        <!-- AUTH TABS -->
+        <div class="auth-tabs" style="display:flex; justify-content:center; gap:8px; margin-bottom:14px;">
+          <button id="btn-auth-tab-login" class="btn-auth-tab active" style="flex:1; padding:8px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.2); background:rgba(217,119,6,0.25); color:#FDE047; font-weight:600; cursor:pointer;">Đăng Nhập</button>
+          <button id="btn-auth-tab-register" class="btn-auth-tab" style="flex:1; padding:8px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.05); color:#94A3B8; font-weight:600; cursor:pointer;">Đăng Ký Mới</button>
+        </div>
+
+        <!-- LOGIN FORM -->
+        <div id="login-box" class="login-card">
           <h2 class="card-title">Đăng Nhập Sổ Tay</h2>
           <p class="card-desc">Nhập tài khoản để mở khóa nhật ký riêng tư</p>
 
@@ -48,6 +55,39 @@
           <button id="btn-login-submit" class="btn-primary">
             <span>Đăng Nhập</span>
             <span class="btn-arrow">→</span>
+          </button>
+        </div>
+
+        <!-- REGISTER FORM -->
+        <div id="register-box" class="login-card" style="display:none;">
+          <h2 class="card-title">Tạo Sổ Tay Mới</h2>
+          <p class="card-desc">Tạo tài khoản riêng tư ngay trên thiết bị của bạn</p>
+
+          <div id="register-error" class="error-banner" style="display: none;"></div>
+
+          <div class="form-group">
+            <label for="reg-username">Tên đăng nhập (viết liền không dấu):</label>
+            <input type="text" id="reg-username" placeholder="ví dụ: quangnguyen..." autocomplete="off">
+          </div>
+
+          <div class="form-group">
+            <label for="reg-display-name">Tên hiển thị (biệt danh của bạn):</label>
+            <input type="text" id="reg-display-name" placeholder="ví dụ: Quang Nguyễn..." autocomplete="off">
+          </div>
+
+          <div class="form-group">
+            <label for="reg-password">Mật khẩu:</label>
+            <input type="password" id="reg-password" placeholder="Mật khẩu ít nhất 4 ký tự...">
+          </div>
+
+          <div class="form-group">
+            <label for="reg-confirm-pwd">Xác nhận mật khẩu:</label>
+            <input type="password" id="reg-confirm-pwd" placeholder="Nhập lại mật khẩu...">
+          </div>
+
+          <button id="btn-register-submit" class="btn-primary" style="background: linear-gradient(135deg, #10B981, #059669);">
+            <span>Đăng Ký & Bắt Đầu</span>
+            <span class="btn-arrow">✨</span>
           </button>
         </div>
 
@@ -170,13 +210,34 @@
         <!-- TAB 5: CÀI ĐẶT & QUẢN TRỊ -->
         <section id="tab-settings" class="tab-pane">
           <div class="settings-card">
-            <h3>👤 Hồ Sơ Của Bạn</h3>
+            <h3>👤 Hồ Sơ & Đổi Mật Khẩu</h3>
             <p class="hint-text">Tên đăng nhập hệ thống: <strong id="settings-username">@admin</strong></p>
+            
             <div class="form-group">
-              <label>Tên hiển thị:</label>
-              <input type="text" id="settings-display-name" class="text-input">
+              <label>Tên hiển thị (biệt danh):</label>
+              <input type="text" id="settings-display-name" class="text-input" placeholder="Tên hiển thị của bạn...">
             </div>
-            <button id="btn-save-profile" class="btn-secondary">Lưu Tên Hiển Thị</button>
+
+            <hr style="border:none; border-top:1px solid rgba(255,255,255,0.08); margin: 16px 0;">
+
+            <p class="hint-text" style="color:#FDE047; font-weight:600; margin-bottom:8px;">🔒 Đổi Mật Khẩu (Để trống nếu không muốn đổi):</p>
+            
+            <div class="form-group">
+              <label>Mật khẩu hiện tại:</label>
+              <input type="password" id="settings-current-pwd" class="text-input" placeholder="Nhập mật khẩu hiện tại...">
+            </div>
+
+            <div class="form-group">
+              <label>Mật khẩu mới:</label>
+              <input type="password" id="settings-new-pwd" class="text-input" placeholder="Mật khẩu mới (ít nhất 4 ký tự)...">
+            </div>
+
+            <div class="form-group">
+              <label>Xác nhận mật khẩu mới:</label>
+              <input type="password" id="settings-confirm-pwd" class="text-input" placeholder="Nhập lại mật khẩu mới...">
+            </div>
+
+            <button id="btn-save-profile" class="btn-primary" style="margin-top: 10px;">Lưu Thay Đổi Hồ Sơ & Mật Khẩu</button>
           </div>
 
           <!-- SOUND & MUSIC SETTINGS -->

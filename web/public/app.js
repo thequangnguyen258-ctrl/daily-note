@@ -355,6 +355,79 @@ class LocalStore {
     return true;
   }
 
+  registerAccount(uname, displayName, password) {
+    const list = this.getAccounts();
+    const clean = uname.trim().toLowerCase();
+    if (!clean || clean.length < 3) {
+      return { success: false, msg: 'Tên đăng nhập cần ít nhất 3 ký tự.' };
+    }
+    if (!/^[a-zA-Z0-9_]+$/.test(clean)) {
+      return { success: false, msg: 'Tên đăng nhập chỉ chứa chữ cái, số và dấu gạch dưới (_).' };
+    }
+    if (list.some(a => a.username.toLowerCase() === clean)) {
+      return { success: false, msg: 'Tên đăng nhập này đã được sử dụng!' };
+    }
+    if (!password || password.length < 4) {
+      return { success: false, msg: 'Mật khẩu phải có ít nhất 4 ký tự.' };
+    }
+
+    const newAcc = {
+      username: clean,
+      password: password,
+      isAdmin: false,
+      displayName: displayName.trim() || clean
+    };
+    list.push(newAcc);
+    localStorage.setItem(this.prefix + 'accounts', JSON.stringify(list));
+    return { success: true, account: newAcc };
+  }
+
+  updateProfile(uname, newDisplayName, currentPwd, newPwd) {
+    const list = this.getAccounts();
+    const idx = list.findIndex(a => a.username.toLowerCase() === uname.toLowerCase());
+    if (idx === -1) return { success: false, msg: 'Không tìm thấy tài khoản!' };
+
+    const acc = list[idx];
+
+    // If changing password, verify current password
+    if (newPwd) {
+      if (!currentPwd) {
+        return { success: false, msg: 'Vui lòng nhập Mật khẩu hiện tại để xác thực đổi mật khẩu!' };
+      }
+      if (acc.password !== currentPwd) {
+        return { success: false, msg: 'Mật khẩu hiện tại không chính xác!' };
+      }
+      if (newPwd.length < 4) {
+        return { success: false, msg: 'Mật khẩu mới phải có ít nhất 4 ký tự!' };
+      }
+      acc.password = newPwd;
+    }
+
+    if (newDisplayName && newDisplayName.trim()) {
+      acc.displayName = newDisplayName.trim();
+    }
+
+    list[idx] = acc;
+    localStorage.setItem(this.prefix + 'accounts', JSON.stringify(list));
+    return { success: true, account: acc };
+  }
+
+  resetMemberPassword(uname) {
+    const list = this.getAccounts();
+    const idx = list.findIndex(a => a.username.toLowerCase() === uname.toLowerCase());
+    if (idx === -1) return false;
+    list[idx].password = '12345678';
+    localStorage.setItem(this.prefix + 'accounts', JSON.stringify(list));
+    return true;
+  }
+
+  deleteMember(uname) {
+    let list = this.getAccounts();
+    list = list.filter(a => a.username.toLowerCase() !== uname.toLowerCase());
+    localStorage.setItem(this.prefix + 'accounts', JSON.stringify(list));
+    return true;
+  }
+
   getUserData(uname) {
     try {
       const data = localStorage.getItem(this.prefix + 'user_' + uname);
@@ -1440,6 +1513,14 @@ function renderSettings() {
   if (!currentUser) return;
   document.getElementById('settings-username').innerText = `@${currentUser.username}`;
   document.getElementById('settings-display-name').value = currentUser.displayName || currentUser.username;
+  
+  const curPwdEl = document.getElementById('settings-current-pwd');
+  if (curPwdEl) curPwdEl.value = '';
+  const newPwdEl = document.getElementById('settings-new-pwd');
+  if (newPwdEl) newPwdEl.value = '';
+  const confPwdEl = document.getElementById('settings-confirm-pwd');
+  if (confPwdEl) confPwdEl.value = '';
+
   document.getElementById('settings-gemini-key').value = store.getGeminiKey();
 
   const soundToggle = document.getElementById('settings-sound-toggle');
@@ -1483,11 +1564,48 @@ function renderAdminMemberList() {
   accounts.forEach(acc => {
     const row = document.createElement('div');
     row.className = 'member-row';
+    row.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:8px 10px; background:rgba(255,255,255,0.04); border-radius:8px; margin-bottom:6px; font-size:12px;';
+    
+    let actionsHtml = '';
+    if (!acc.isAdmin) {
+      actionsHtml = `
+        <div style="display:flex; gap:6px;">
+          <button class="btn-reset-member-pwd" data-user="${acc.username}" style="background:rgba(234,179,8,0.2); border:1px solid rgba(234,179,8,0.4); color:#FDE047; padding:4px 8px; border-radius:6px; font-size:11px; cursor:pointer;" title="Đặt lại mật khẩu về 12345678">Reset MK</button>
+          <button class="btn-delete-member" data-user="${acc.username}" style="background:rgba(239,68,68,0.2); border:1px solid rgba(239,68,68,0.4); color:#FCA5A5; padding:4px 8px; border-radius:6px; font-size:11px; cursor:pointer;" title="Xóa tài khoản">Xóa</button>
+        </div>
+      `;
+    }
+
     row.innerHTML = `
-      <span>@${acc.username} (${acc.displayName})</span>
-      <span style="color:#6EE7B7;">${acc.isAdmin ? '👑 Admin' : '👤 Thành viên'}</span>
+      <div style="display:flex; flex-direction:column; gap:2px;">
+        <span><strong>@${acc.username}</strong> (${acc.displayName || acc.username})</span>
+        <span style="color:${acc.isAdmin ? '#FDE047' : '#94A3B8'}; font-size:11px;">${acc.isAdmin ? '👑 Quản Trị Viên' : '👤 Thành Viên'}</span>
+      </div>
+      ${actionsHtml}
     `;
     list.appendChild(row);
+  });
+
+  // Attach actions
+  list.querySelectorAll('.btn-reset-member-pwd').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const u = e.currentTarget.getAttribute('data-user');
+      if (confirm(`Bạn có chắc muốn đặt lại mật khẩu của @${u} về mặc định "12345678"?`)) {
+        store.resetMemberPassword(u);
+        alert(`Đã đặt lại mật khẩu cho @${u} thành công (12345678)!`);
+      }
+    });
+  });
+
+  list.querySelectorAll('.btn-delete-member').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const u = e.currentTarget.getAttribute('data-user');
+      if (confirm(`Bạn có chắc muốn xóa tài khoản @${u}? Thao tác này không thể hoàn tác.`)) {
+        store.deleteMember(u);
+        renderAdminMemberList();
+        alert(`Đã xóa tài khoản @${u}!`);
+      }
+    });
   });
 }
 
@@ -1498,10 +1616,43 @@ document.getElementById('btn-add-member').addEventListener('click', () => {
   if (ok) {
     document.getElementById('new-member-username').value = '';
     renderAdminMemberList();
-    alert(`Đã thêm thành viên @${val.toLowerCase()} (Mật khẩu: 12345678)`);
+    alert(`Đã thêm thành viên @${val.toLowerCase()} (Mật khẩu mặc định: 12345678)`);
   } else {
     alert('Tài khoản đã tồn tại!');
   }
+});
+
+// SAVE PROFILE & CHANGE PASSWORD
+document.getElementById('btn-save-profile').addEventListener('click', () => {
+  if (!currentUser) return;
+  const newDisplayName = document.getElementById('settings-display-name').value.trim();
+  const currentPwd = document.getElementById('settings-current-pwd').value.trim();
+  const newPwd = document.getElementById('settings-new-pwd').value.trim();
+  const confirmPwd = document.getElementById('settings-confirm-pwd').value.trim();
+
+  if (newPwd) {
+    if (newPwd !== confirmPwd) {
+      alert('Xác nhận mật khẩu mới không khớp! Vui lòng nhập lại.');
+      return;
+    }
+  }
+
+  const result = store.updateProfile(currentUser.username, newDisplayName, currentPwd, newPwd);
+  if (!result.success) {
+    alert(result.msg);
+    return;
+  }
+
+  // Update currentUser reference
+  currentUser = result.account;
+  document.getElementById('display-user-name').innerText = currentUser.displayName ? `${currentUser.displayName} (@${currentUser.username})` : `@${currentUser.username}`;
+  
+  // Clear password inputs
+  document.getElementById('settings-current-pwd').value = '';
+  document.getElementById('settings-new-pwd').value = '';
+  document.getElementById('settings-confirm-pwd').value = '';
+
+  alert('Đã lưu thành công thông tin hồ sơ và mật khẩu mới!');
 });
 
 document.getElementById('btn-save-gemini-key').addEventListener('click', () => {
@@ -1535,7 +1686,36 @@ function logout() {
 document.getElementById('btn-quick-logout').addEventListener('click', logout);
 document.getElementById('btn-settings-logout').addEventListener('click', logout);
 
-// 9. LOGIN LOGIC
+// 9. AUTH LOGIC (LOGIN & REGISTER)
+const btnAuthLogin = document.getElementById('btn-auth-tab-login');
+const btnAuthReg = document.getElementById('btn-auth-tab-register');
+const loginBox = document.getElementById('login-box');
+const regBox = document.getElementById('register-box');
+
+if (btnAuthLogin && btnAuthReg) {
+  btnAuthLogin.addEventListener('click', () => {
+    btnAuthLogin.classList.add('active');
+    btnAuthLogin.style.background = 'rgba(217,119,6,0.25)';
+    btnAuthLogin.style.color = '#FDE047';
+    btnAuthReg.classList.remove('active');
+    btnAuthReg.style.background = 'rgba(255,255,255,0.05)';
+    btnAuthReg.style.color = '#94A3B8';
+    loginBox.style.display = 'block';
+    regBox.style.display = 'none';
+  });
+
+  btnAuthReg.addEventListener('click', () => {
+    btnAuthReg.classList.add('active');
+    btnAuthReg.style.background = 'rgba(16,185,129,0.25)';
+    btnAuthReg.style.color = '#6EE7B7';
+    btnAuthLogin.classList.remove('active');
+    btnAuthLogin.style.background = 'rgba(255,255,255,0.05)';
+    btnAuthLogin.style.color = '#94A3B8';
+    loginBox.style.display = 'none';
+    regBox.style.display = 'block';
+  });
+}
+
 document.getElementById('toggle-pwd-btn').addEventListener('click', () => {
   const pwdInput = document.getElementById('login-password');
   pwdInput.type = pwdInput.type === 'password' ? 'text' : 'password';
@@ -1545,6 +1725,46 @@ document.getElementById('btn-login-submit').addEventListener('click', handleLogi
 document.getElementById('login-password').addEventListener('keydown', (e) => {
   if (e.key === 'Enter') handleLogin();
 });
+
+// REGISTER SUBMIT
+const btnRegSubmit = document.getElementById('btn-register-submit');
+if (btnRegSubmit) {
+  btnRegSubmit.addEventListener('click', handleRegister);
+}
+
+function handleRegister() {
+  const u = document.getElementById('reg-username').value.trim().toLowerCase();
+  const name = document.getElementById('reg-display-name').value.trim();
+  const p = document.getElementById('reg-password').value.trim();
+  const pConf = document.getElementById('reg-confirm-pwd').value.trim();
+  const errBanner = document.getElementById('register-error');
+
+  if (!u || !p) {
+    errBanner.innerText = 'Vui lòng nhập tên đăng nhập và mật khẩu.';
+    errBanner.style.display = 'block';
+    return;
+  }
+
+  if (p !== pConf) {
+    errBanner.innerText = 'Mật khẩu xác nhận không khớp!';
+    errBanner.style.display = 'block';
+    return;
+  }
+
+  const res = store.registerAccount(u, name, p);
+  if (!res.success) {
+    errBanner.innerText = res.msg;
+    errBanner.style.display = 'block';
+    return;
+  }
+
+  errBanner.style.display = 'none';
+  alert(`Đăng ký tài khoản @${u} thành công! Hệ thống đang tự động đăng nhập...`);
+
+  // Direct login
+  currentUser = res.account;
+  loginSuccess(currentUser);
+}
 
 function handleLogin() {
   const u = document.getElementById('login-username').value.trim().toLowerCase();
@@ -1568,10 +1788,13 @@ function handleLogin() {
 
   errBanner.style.display = 'none';
   currentUser = match;
+  loginSuccess(currentUser);
+}
 
+function loginSuccess(user) {
   // Update headers
-  document.getElementById('display-user-name').innerText = `@${match.username}`;
-  document.getElementById('display-user-role').innerText = match.isAdmin ? 'Quản trị viên' : 'Thành viên';
+  document.getElementById('display-user-name').innerText = user.displayName ? `${user.displayName} (@${user.username})` : `@${user.username}`;
+  document.getElementById('display-user-role').innerText = user.isAdmin ? 'Quản trị viên' : 'Thành viên';
   updateHeaderDrops();
 
   // Show main screen
