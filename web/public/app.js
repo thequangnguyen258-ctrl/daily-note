@@ -407,29 +407,94 @@ function drawTree() {
     ctx.globalAlpha = 1.0;
   }
 
-  // 5. ROOTS
+  // DYNAMIC GROWTH LEVEL (Từ mầm non mảnh mai 3 rễ -> Đại thụ rễ sâu to lớn)
+  const totalScore = (uData.waterDrops || 0) + 
+                     (uData.amenFruits?.length || 0) * 12 + 
+                     (uData.amenLeaves?.length || 0) * 10 + 
+                     (uData.journals?.length || 0) * 15;
+  // growth: 0.18 (cây non ban đầu bé) -> 1.0 (đại thụ to lớn)
+  const growth = Math.min(1.0, Math.max(0.18, totalScore / 180));
+
+  // 5. DYNAMIC ROOTS SYSTEM (Mọc thêm rễ & rễ to lên theo thời gian)
   const rootColor = '#8D532B';
-  const roots = [
-    { start: [w * 0.48, soilY], end: [w * 0.22, h * 0.94], bend: w * 0.32 },
-    { start: [w * 0.50, soilY], end: [w * 0.48, h * 0.96], bend: w * 0.49 },
-    { start: [w * 0.52, soilY], end: [w * 0.78, h * 0.94], bend: w * 0.68 }
+  const rootGlowColor = isWateringAnim ? '#FEF08A' : 'rgba(56, 189, 248, 0.4)';
+
+  // Danh sách các nhánh rễ mở rộng theo độ tăng trưởng (growth)
+  const dynamicRoots = [
+    // 3 Nhánh rễ chính ban đầu (luôn có)
+    { start: [w * 0.49, soilY], end: [w * (0.5 - 0.26 * growth), soilY + (h - soilY) * (0.65 + 0.30 * growth)], bend: w * (0.5 - 0.14 * growth), thick: 2.2 + 5.5 * growth },
+    { start: [w * 0.50, soilY], end: [w * 0.49, soilY + (h - soilY) * (0.70 + 0.26 * growth)], bend: w * 0.50, thick: 2.8 + 6.2 * growth },
+    { start: [w * 0.51, soilY], end: [w * (0.5 + 0.26 * growth), soilY + (h - soilY) * (0.65 + 0.30 * growth)], bend: w * (0.5 + 0.14 * growth), thick: 2.2 + 5.5 * growth }
   ];
 
-  roots.forEach((r, idx) => {
+  // Mọc thêm 2 rễ phụ khi cây bắt đầu lớn (growth >= 0.35)
+  if (growth >= 0.35) {
+    dynamicRoots.push(
+      { start: [w * 0.48, soilY + 10], end: [w * (0.5 - 0.38 * growth), soilY + (h - soilY) * 0.60], bend: w * (0.5 - 0.24 * growth), thick: 1.8 + 3.8 * growth },
+      { start: [w * 0.52, soilY + 10], end: [w * (0.5 + 0.38 * growth), soilY + (h - soilY) * 0.60], bend: w * (0.5 + 0.24 * growth), thick: 1.8 + 3.8 * growth }
+    );
+  }
+
+  // Mọc thêm 2 rễ sâu đâm vào dòng nước hằng sống (growth >= 0.65)
+  if (growth >= 0.65) {
+    dynamicRoots.push(
+      { start: [w * 0.49, soilY + 25], end: [w * (0.5 - 0.16 * growth), soilY + (h - soilY) * 0.94], bend: w * (0.5 - 0.08 * growth), thick: 1.5 + 3.5 * growth },
+      { start: [w * 0.51, soilY + 25], end: [w * (0.5 + 0.16 * growth), soilY + (h - soilY) * 0.94], bend: w * (0.5 + 0.08 * growth), thick: 1.5 + 3.5 * growth }
+    );
+  }
+
+  // Mọc thêm 2 rễ đại thụ xum xuê đan xen (growth >= 0.85)
+  if (growth >= 0.85) {
+    dynamicRoots.push(
+      { start: [w * 0.47, soilY + 18], end: [w * 0.18, soilY + (h - soilY) * 0.82], bend: w * 0.30, thick: 2.0 + 2.5 * growth },
+      { start: [w * 0.53, soilY + 18], end: [w * 0.82, soilY + (h - soilY) * 0.82], bend: w * 0.70, thick: 2.0 + 2.5 * growth }
+    );
+  }
+
+  // Cập nhật nhãn thông tin cấp độ tăng trưởng và số lượng rễ trên UI
+  const stageEl = document.getElementById('tree-stage-name');
+  const rootCountEl = document.getElementById('tree-root-count');
+  if (stageEl && rootCountEl) {
+    if (growth < 0.35) {
+      stageEl.innerHTML = '🌱 Mầm Non Tĩnh Nguyện (Cấp 1)';
+    } else if (growth < 0.65) {
+      stageEl.innerHTML = '🌿 Cây Đang Tăng Trưởng (Cấp 2)';
+    } else if (growth < 0.85) {
+      stageEl.innerHTML = '🌳 Cây Trưởng Thành Bền Vững (Cấp 3)';
+    } else {
+      stageEl.innerHTML = '✨ Đại Thụ Sự Sống Vinh Hiển (Cấp 4)';
+    }
+    rootCountEl.innerText = `🪵 ${dynamicRoots.length} Rễ Đức Tin (${(dynamicRoots[0].thick).toFixed(1)}px)`;
+  }
+
+  // Vẽ các nhánh rễ
+  dynamicRoots.forEach((r) => {
     ctx.beginPath();
     ctx.strokeStyle = rootColor;
-    ctx.lineWidth = 5;
+    ctx.lineWidth = r.thick;
     ctx.lineCap = 'round';
     ctx.moveTo(r.start[0], r.start[1]);
     ctx.quadraticCurveTo(r.bend, (soilY + r.end[1]) / 2, r.end[0], r.end[1]);
     ctx.stroke();
 
-    // Golden divine glow on roots when water dissolves rocks
-    if (isWateringAnim && wateringProgress > 0.4) {
+    // Rễ tơ phụ nhỏ tỏa ra
+    if (growth >= 0.45) {
       ctx.beginPath();
-      ctx.strokeStyle = '#FEF08A';
-      ctx.lineWidth = 2.5;
-      ctx.globalAlpha = (wateringProgress - 0.4) * 1.4;
+      ctx.strokeStyle = '#6E3A1A';
+      ctx.lineWidth = Math.max(1, r.thick * 0.35);
+      const midX = (r.start[0] + r.end[0]) / 2;
+      const midY = (soilY + r.end[1]) / 2;
+      ctx.moveTo(midX, midY);
+      ctx.lineTo(midX + (r.end[0] > w * 0.5 ? 12 : -12), midY + 14);
+      ctx.stroke();
+    }
+
+    // Hiệu ứng ánh sáng dòng nước hằng sống trong rễ cây
+    if (isWateringAnim || growth >= 0.7) {
+      ctx.beginPath();
+      ctx.strokeStyle = isWateringAnim ? '#FEF08A' : 'rgba(56, 189, 248, 0.25)';
+      ctx.lineWidth = Math.max(1.2, r.thick * 0.4);
+      ctx.globalAlpha = isWateringAnim ? Math.min(1.0, wateringProgress * 1.5) : (0.3 + Math.sin(tick * 2) * 0.2);
       ctx.moveTo(r.start[0], r.start[1]);
       ctx.quadraticCurveTo(r.bend, (soilY + r.end[1]) / 2, r.end[0], r.end[1]);
       ctx.stroke();
@@ -448,19 +513,16 @@ function drawTree() {
     ];
 
     rockPositions.forEach(rock => {
-      // Rock body
       ctx.fillStyle = '#64748B';
       ctx.beginPath();
       ctx.arc(rock.x, rock.y, rock.r, 0, Math.PI * 2);
       ctx.fill();
 
-      // Rock highlights
       ctx.fillStyle = '#94A3B8';
       ctx.beginPath();
       ctx.arc(rock.x - rock.r * 0.3, rock.y - rock.r * 0.3, rock.r * 0.4, 0, Math.PI * 2);
       ctx.fill();
 
-      // Glowing crack veins when dissolving
       if (isWateringAnim && wateringProgress > 0.2) {
         ctx.strokeStyle = '#67E8F9';
         ctx.lineWidth = 2;
@@ -483,19 +545,28 @@ function drawTree() {
   ctx.lineTo(0, soilY + 8);
   ctx.fill();
 
-  // 8. TREE TRUNK
-  const trunkGrad = ctx.createLinearGradient(w * 0.4, 0, w * 0.6, 0);
+  // 8. DYNAMIC TREE TRUNK (Ban đầu bé thanh mảnh, to dần thành đại thụ vững chãi)
+  const trunkBaseSpread = w * (0.025 + 0.055 * growth); // Bề rộng gốc: nhỏ khi mầm non, to khi trưởng thành
+  const trunkMidSpread = w * (0.015 + 0.035 * growth);  // Bề rộng thân giữa
+  const branchSpread = w * (0.08 + 0.12 * growth);      // Tán cành tỏa rộng
+
+  const trunkGrad = ctx.createLinearGradient(w * (0.5 - trunkBaseSpread), 0, w * (0.5 + trunkBaseSpread), 0);
   trunkGrad.addColorStop(0, '#452715');
   trunkGrad.addColorStop(0.5, '#784423');
   trunkGrad.addColorStop(1, '#452715');
 
   ctx.fillStyle = trunkGrad;
   ctx.beginPath();
-  ctx.moveTo(w * 0.42, soilY);
-  ctx.bezierCurveTo(w * 0.44, h * 0.60, w * 0.45, h * 0.40, w * 0.38, h * 0.28);
-  ctx.bezierCurveTo(w * 0.46, h * 0.35, w * 0.50, h * 0.42, w * 0.50, h * 0.48);
-  ctx.bezierCurveTo(w * 0.54, h * 0.35, w * 0.58, h * 0.30, w * 0.62, h * 0.28);
-  ctx.bezierCurveTo(w * 0.55, h * 0.40, w * 0.56, h * 0.60, w * 0.58, soilY);
+  // Gốc cây bên trái
+  ctx.moveTo(w * 0.5 - trunkBaseSpread, soilY);
+  // Thân dưới -> thân giữa -> cành trái
+  ctx.bezierCurveTo(w * 0.5 - trunkMidSpread, h * 0.60, w * 0.5 - trunkMidSpread * 0.8, h * 0.40, w * 0.5 - branchSpread, h * 0.28);
+  // Nhánh chẽ giữa
+  ctx.bezierCurveTo(w * 0.5 - trunkMidSpread * 0.5, h * 0.35, w * 0.5, h * 0.42, w * 0.5, h * 0.48);
+  // Cành phải
+  ctx.bezierCurveTo(w * 0.5 + trunkMidSpread * 0.5, h * 0.35, w * 0.5 + branchSpread * 0.8, h * 0.30, w * 0.5 + branchSpread, h * 0.28);
+  // Thân giữa -> Gốc cây bên phải
+  ctx.bezierCurveTo(w * 0.5 + trunkMidSpread * 0.8, h * 0.40, w * 0.5 + trunkMidSpread, h * 0.60, w * 0.5 + trunkBaseSpread, soilY);
   ctx.closePath();
   ctx.fill();
 
