@@ -190,6 +190,11 @@ const CORE_NEEDS = [
 class SanctuaryAudio {
   constructor() {
     this.ctx = null;
+    this.bgMusic = new Audio('/nhac-cau-nguyen.mp3');
+    this.bgMusic.loop = true; // Hết bài tự phát lại từ đầu
+    this.bgMusic.preload = 'auto';
+    this.bgMusic.volume = 0.55;
+    this.hasStartedMusic = false;
   }
 
   init() {
@@ -199,6 +204,45 @@ class SanctuaryAudio {
     }
     if (this.ctx && this.ctx.state === 'suspended') {
       this.ctx.resume();
+    }
+  }
+
+  startBgMusic() {
+    if (store && !store.isSoundEnabled()) return;
+    this.bgMusic.play().then(() => {
+      this.hasStartedMusic = true;
+      this.updateMusicButtonUI(true);
+    }).catch((err) => {
+      console.log('Autoplay chờ tương tác đầu tiên của người dùng:', err);
+    });
+  }
+
+  stopBgMusic() {
+    this.bgMusic.pause();
+    this.updateMusicButtonUI(false);
+  }
+
+  toggleBgMusic() {
+    if (this.bgMusic.paused) {
+      store.setSoundEnabled(true);
+      this.startBgMusic();
+      showBanner('Đã bật Nhạc Nền Cầu Nguyện 🎵');
+    } else {
+      store.setSoundEnabled(false);
+      this.stopBgMusic();
+      showBanner('Đã tạm dừng Nhạc Nền 🔇');
+    }
+  }
+
+  updateMusicButtonUI(isPlaying) {
+    const btn = document.getElementById('btn-toggle-music');
+    if (btn) {
+      btn.innerText = isPlaying ? '🎵' : '🔇';
+      btn.title = isPlaying ? 'Đang phát Nhạc Cầu Nguyện (Bấm để tắt)' : 'Nhạc đang tắt (Bấm để bật)';
+    }
+    const soundToggle = document.getElementById('settings-sound-toggle');
+    if (soundToggle) {
+      soundToggle.checked = isPlaying;
     }
   }
 
@@ -1415,7 +1459,20 @@ function renderSettings() {
 const soundToggleEl = document.getElementById('settings-sound-toggle');
 if (soundToggleEl) {
   soundToggleEl.addEventListener('change', (e) => {
-    store.setSoundEnabled(e.target.checked);
+    const isEnabled = e.target.checked;
+    store.setSoundEnabled(isEnabled);
+    if (isEnabled) {
+      audio.startBgMusic();
+    } else {
+      audio.stopBgMusic();
+    }
+  });
+}
+
+const btnToggleMusic = document.getElementById('btn-toggle-music');
+if (btnToggleMusic) {
+  btnToggleMusic.addEventListener('click', () => {
+    audio.toggleBgMusic();
   });
 }
 
@@ -1521,12 +1578,28 @@ function handleLogin() {
   document.getElementById('login-screen').classList.remove('active');
   document.getElementById('main-screen').classList.add('active');
 
+  audio.startBgMusic();
   audio.playBell(528);
   resizeCanvas();
   renderCoreNeedList();
   renderChat();
   switchTab('tab-tree');
 }
+
+// TỰ ĐỘNG PHÁT NHẠC NỀN CẦU NGUYỆN KHI MỞ WEB
+window.addEventListener('DOMContentLoaded', () => {
+  audio.startBgMusic();
+});
+document.addEventListener('click', () => {
+  if (!audio.hasStartedMusic && store.isSoundEnabled()) {
+    audio.startBgMusic();
+  }
+}, { once: true });
+document.addEventListener('touchstart', () => {
+  if (!audio.hasStartedMusic && store.isSoundEnabled()) {
+    audio.startBgMusic();
+  }
+}, { once: true });
 
 // START CANVAS LOOP
 drawTree();
