@@ -578,10 +578,9 @@ function drawTree() {
     );
   }
 
-  // Cập nhật nhãn thông tin cấp độ tăng trưởng và số lượng rễ trên UI
+  // Cập nhật nhãn thông tin cấp độ tăng trưởng trên UI
   const stageEl = document.getElementById('tree-stage-name');
-  const rootCountEl = document.getElementById('tree-root-count');
-  if (stageEl && rootCountEl) {
+  if (stageEl) {
     if (growth < 0.35) {
       stageEl.innerHTML = '🌱 Mầm Non Tĩnh Nguyện (Cấp 1)';
     } else if (growth < 0.65) {
@@ -591,7 +590,6 @@ function drawTree() {
     } else {
       stageEl.innerHTML = '✨ Đại Thụ Sự Sống Vinh Hiển (Cấp 4)';
     }
-    rootCountEl.innerText = `🪵 ${dynamicRoots.length} Rễ Đức Tin`;
   }
 
   // Vẽ các nhánh rễ
