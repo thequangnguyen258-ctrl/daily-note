@@ -203,6 +203,7 @@ class SanctuaryAudio {
   }
 
   playBell(freq = 528) {
+    if (store && !store.isSoundEnabled()) return;
     try {
       this.init();
       if (!this.ctx) return;
@@ -228,6 +229,7 @@ class SanctuaryAudio {
   }
 
   playWaterDrop() {
+    if (store && !store.isSoundEnabled()) return;
     try {
       this.init();
       if (!this.ctx) return;
@@ -260,6 +262,14 @@ class LocalStore {
   constructor() {
     this.prefix = 'css_';
     this.initDefaultUsers();
+  }
+
+  isSoundEnabled() {
+    return localStorage.getItem(this.prefix + 'sound_enabled') !== 'false';
+  }
+
+  setSoundEnabled(val) {
+    localStorage.setItem(this.prefix + 'sound_enabled', val ? 'true' : 'false');
   }
 
   initDefaultUsers() {
@@ -307,13 +317,13 @@ class LocalStore {
       if (data) return JSON.parse(data);
     } catch {}
     return {
-      waterDrops: 120,
+      waterDrops: 0,
       amenFruits: [],
       amenLeaves: [],
       isNegative: false,
       journals: [],
       chats: [
-        { role: 'bot', text: 'Bình an cho bạn. Hôm nay tâm hồn bạn thế nào? Hãy chia sẻ những gánh nặng cùng Chúa nhé.' }
+        { role: 'bot', text: '🕊️ Bình an cho con! Ta là Đấng Lắng Nghe Nhân Từ. Con đang có tâm sự hay gánh nặng gì muốn dốc đổ cùng Cha hôm nay?' }
       ]
     };
   }
@@ -464,7 +474,7 @@ function drawTree() {
     } else {
       stageEl.innerHTML = '✨ Đại Thụ Sự Sống Vinh Hiển (Cấp 4)';
     }
-    rootCountEl.innerText = `🪵 ${dynamicRoots.length} Rễ Đức Tin (${(dynamicRoots[0].thick).toFixed(1)}px)`;
+    rootCountEl.innerText = `🪵 ${dynamicRoots.length} Rễ Đức Tin`;
   }
 
   // Vẽ các nhánh rễ
@@ -574,14 +584,12 @@ function drawTree() {
   const weedAlpha = uData.isNegative ? (isHolyFireAnim ? Math.max(0, 1.0 - fireProgress) : 1.0) : 0;
   if (weedAlpha > 0.02) {
     ctx.globalAlpha = weedAlpha;
-    // Brambles around trunk
     ctx.strokeStyle = '#991B1B';
     ctx.lineWidth = 3.5;
     ctx.beginPath();
     ctx.arc(w * 0.5, soilY - 10, 32, Math.PI, 0);
     ctx.stroke();
 
-    // Tall Tares (Cỏ lùng)
     const tares = [
       { x: w * 0.28, h: 65, lean: -8 },
       { x: w * 0.34, h: 78, lean: 4 },
@@ -598,13 +606,11 @@ function drawTree() {
       ctx.quadraticCurveTo(t.x + t.lean * 0.5, soilY - t.h * 0.6, t.x + t.lean, soilY - t.h);
       ctx.stroke();
 
-      // Tare head (dark seeds or flaming torch)
       ctx.fillStyle = isBurning ? '#FEF08A' : '#451A03';
       ctx.beginPath();
       ctx.ellipse(t.x + t.lean, soilY - t.h - 5, 5, 10, 0, 0, Math.PI * 2);
       ctx.fill();
 
-      // Fire flame licking up the tare
       if (isBurning) {
         ctx.fillStyle = '#EF4444';
         ctx.beginPath();
@@ -626,7 +632,7 @@ function drawTree() {
     { x: w * 0.62, y: h * 0.40, r: w * 0.13 }
   ];
 
-  canopies.forEach((c, idx) => {
+  canopies.forEach((c) => {
     const folGrad = ctx.createRadialGradient(c.x, c.y, c.r * 0.2, c.x, c.y, c.r);
     folGrad.addColorStop(0, '#10B981');
     folGrad.addColorStop(1, '#065F46');
@@ -642,19 +648,16 @@ function drawTree() {
     const fy = h * f.y;
     const isAmen = uData.amenFruits && uData.amenFruits.includes(f.id);
 
-    // Glowing halo
     ctx.fillStyle = isAmen ? 'rgba(254, 240, 138, 0.45)' : 'rgba(255, 255, 255, 0.15)';
     ctx.beginPath();
     ctx.arc(fx, fy, 16, 0, Math.PI * 2);
     ctx.fill();
 
-    // Fruit body
     ctx.fillStyle = isAmen ? '#F59E0B' : f.color;
     ctx.beginPath();
     ctx.arc(fx, fy, 11, 0, Math.PI * 2);
     ctx.fill();
 
-    // Little fruit shine
     ctx.fillStyle = '#FFF';
     ctx.beginPath();
     ctx.arc(fx - 3, fy - 3, 3, 0, Math.PI * 2);
@@ -673,58 +676,188 @@ function drawTree() {
     ctx.fill();
   });
 
-  // 13. ANGEL WATERING ANIMATION
+  // 13. CINEMATIC ANGEL WATERING ANIMATION
+  // (Thiên sứ cầm bình vàng -> Đổ nước -> Tụ thành mây -> Mưa rơi 5-10s -> Cây tươi tốt -> Chim bồ câu bay)
   if (isWateringAnim) {
-    const angelX = w * 0.50;
-    const angelY = h * 0.12;
+    const p = wateringProgress; // 0.0 -> 1.0
 
-    // Divine halo
-    ctx.fillStyle = 'rgba(253, 224, 71, 0.35)';
-    ctx.beginPath();
-    ctx.arc(angelX, angelY, 40, 0, Math.PI * 2);
-    ctx.fill();
+    // --- PHASE 1 & 2: THIÊN SỨ CẦM BÌNH VÀNG & ĐỔ NƯỚC (p: 0.0 -> 0.38) ---
+    if (p < 0.45) {
+      const angelAlpha = p < 0.35 ? 1.0 : Math.max(0, 1.0 - (p - 0.35) * 10);
+      ctx.globalAlpha = angelAlpha;
 
-    // Angel Wings
-    ctx.fillStyle = '#FFF';
-    ctx.beginPath();
-    ctx.ellipse(angelX - 25, angelY + 5, 20, 10, -0.4, 0, Math.PI * 2);
-    ctx.ellipse(angelX + 25, angelY + 5, 20, 10, 0.4, 0, Math.PI * 2);
-    ctx.fill();
+      const angelX = w * 0.50 + Math.sin(tick * 2) * 5;
+      const angelY = h * 0.10 + Math.sin(tick * 1.5) * 4;
 
-    // Angel Head & Robe
-    ctx.fillStyle = '#FEF08A';
-    ctx.beginPath();
-    ctx.arc(angelX, angelY - 8, 9, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#FFF';
-    ctx.beginPath();
-    ctx.moveTo(angelX, angelY);
-    ctx.lineTo(angelX - 14, angelY + 28);
-    ctx.lineTo(angelX + 14, angelY + 28);
-    ctx.closePath();
-    ctx.fill();
+      // Hào quang thiên sứ
+      const angelGlow = ctx.createRadialGradient(angelX, angelY, 10, angelX, angelY, 60);
+      angelGlow.addColorStop(0, 'rgba(254, 240, 138, 0.6)');
+      angelGlow.addColorStop(1, 'rgba(254, 240, 138, 0.0)');
+      ctx.fillStyle = angelGlow;
+      ctx.beginPath();
+      ctx.arc(angelX, angelY, 60, 0, Math.PI * 2);
+      ctx.fill();
 
-    // Jar tilted
-    ctx.fillStyle = '#F59E0B';
-    ctx.beginPath();
-    ctx.ellipse(angelX + 14, angelY + 12, 7, 10, -0.6, 0, Math.PI * 2);
-    ctx.fill();
+      // Đôi cánh thiên thần trắng phát sáng vỗ nhịp
+      const wingFlap = Math.sin(tick * 10) * 6;
+      ctx.fillStyle = '#FFF';
+      ctx.beginPath();
+      ctx.ellipse(angelX - 26, angelY - 2 + wingFlap, 24, 12, -0.35, 0, Math.PI * 2);
+      ctx.ellipse(angelX + 26, angelY - 2 + wingFlap, 24, 12, 0.35, 0, Math.PI * 2);
+      ctx.fill();
 
-    // Water Torrent Pouring Down
-    const waterGrad = ctx.createLinearGradient(0, angelY + 18, 0, soilY + 50);
-    waterGrad.addColorStop(0, '#67E8F9');
-    waterGrad.addColorStop(0.5, '#06B6D4');
-    waterGrad.addColorStop(1, '#059669');
+      // Đầu & Thân thiên sứ
+      ctx.fillStyle = '#FEF08A';
+      ctx.beginPath();
+      ctx.arc(angelX, angelY - 10, 9, 0, Math.PI * 2);
+      ctx.fill();
 
-    ctx.fillStyle = waterGrad;
-    ctx.beginPath();
-    ctx.moveTo(angelX + 16, angelY + 18);
-    ctx.lineTo(angelX - 35, soilY + 30);
-    ctx.lineTo(angelX + 55, soilY + 30);
-    ctx.closePath();
-    ctx.globalAlpha = 0.75;
-    ctx.fill();
-    ctx.globalAlpha = 1.0;
+      ctx.fillStyle = '#FFFFFF';
+      ctx.beginPath();
+      ctx.moveTo(angelX, angelY - 2);
+      ctx.lineTo(angelX - 15, angelY + 28);
+      ctx.lineTo(angelX + 15, angelY + 28);
+      ctx.closePath();
+      ctx.fill();
+
+      // Bình nước vàng ròng (Golden Urn)
+      const isPouring = p >= 0.15;
+      const urnTilt = isPouring ? -0.85 : -0.2;
+      const urnX = angelX + 12;
+      const urnY = angelY + 14;
+
+      ctx.save();
+      ctx.translate(urnX, urnY);
+      ctx.rotate(urnTilt);
+      ctx.fillStyle = '#F59E0B';
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 9, 14, 0, 0, Math.PI * 2);
+      ctx.fill();
+      // Quai bình & miệng bình vàng
+      ctx.strokeStyle = '#FEF08A';
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+      ctx.restore();
+
+      // Dòng nước sự sống tuôn trào từ miệng bình xuống giữa trời
+      if (isPouring) {
+        ctx.fillStyle = '#67E8F9';
+        ctx.beginPath();
+        ctx.moveTo(urnX + 4, urnY + 6);
+        ctx.quadraticCurveTo(w * 0.49, h * 0.18, w * 0.50, h * 0.20);
+        ctx.lineTo(w * 0.52, h * 0.20);
+        ctx.quadraticCurveTo(w * 0.51, h * 0.18, urnX + 8, urnY + 4);
+        ctx.fill();
+
+        // Hạt bụi vàng lấp lánh rơi
+        for (let i = 0; i < 6; i++) {
+          ctx.fillStyle = '#FEF08A';
+          ctx.beginPath();
+          ctx.arc(w * 0.50 + Math.sin(tick * 8 + i) * 12, h * 0.16 + i * 7, 2.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+      ctx.globalAlpha = 1.0;
+    }
+
+    // --- PHASE 3: ĐÁM MÂY THẦN THÁNH VÀ MƯA RÀO TƯƠI MÁT (p: 0.25 -> 0.88) ---
+    if (p >= 0.25 && p <= 0.88) {
+      const cloudAlpha = p < 0.35 ? (p - 0.25) * 10 : (p > 0.80 ? (0.88 - p) * 12 : 1.0);
+      ctx.globalAlpha = Math.max(0, Math.min(1.0, cloudAlpha));
+
+      const cloudY = h * 0.14 + Math.sin(tick * 1.5) * 3;
+      const cloudX = w * 0.50;
+
+      // Vẽ Đám Mây Thần Thánh phát sáng bồng bềnh
+      const cloudGrad = ctx.createRadialGradient(cloudX, cloudY, 20, cloudX, cloudY, w * 0.30);
+      cloudGrad.addColorStop(0, 'rgba(224, 242, 254, 0.95)');
+      cloudGrad.addColorStop(0.5, 'rgba(56, 189, 248, 0.80)');
+      cloudGrad.addColorStop(1, 'rgba(30, 58, 138, 0.0)');
+
+      ctx.fillStyle = cloudGrad;
+      ctx.beginPath();
+      ctx.arc(cloudX, cloudY, 35, 0, Math.PI * 2);
+      ctx.arc(cloudX - 45, cloudY + 4, 28, 0, Math.PI * 2);
+      ctx.arc(cloudX + 45, cloudY + 4, 28, 0, Math.PI * 2);
+      ctx.arc(cloudX - 80, cloudY + 10, 20, 0, Math.PI * 2);
+      ctx.arc(cloudX + 80, cloudY + 10, 20, 0, Math.PI * 2);
+      ctx.fill();
+
+      // MƯA RÀO TƯƠI MÁT (Cơn mưa ánh sáng trút xuống cây và đất)
+      ctx.strokeStyle = '#67E8F9';
+      ctx.lineWidth = 2;
+      ctx.lineCap = 'round';
+      for (let i = 0; i < 40; i++) {
+        const rx = w * 0.18 + ((i * 37 + Math.sin(i)) % (w * 0.64));
+        const rainProgress = ((tick * 18 + i * 23) % 100) / 100;
+        const ry = (cloudY + 20) + rainProgress * (soilY - cloudY - 15);
+        const rLen = 14 + (i % 4) * 4;
+
+        ctx.globalAlpha = Math.max(0, Math.min(0.9, cloudAlpha * 0.85));
+        ctx.beginPath();
+        ctx.moveTo(rx, ry);
+        ctx.lineTo(rx - 1.5, ry + rLen);
+        ctx.stroke();
+
+        // Giọt nước chạm mặt đất tạo gợn sóng nước
+        if (ry + rLen >= soilY - 5) {
+          ctx.beginPath();
+          ctx.strokeStyle = '#E0F2FE';
+          ctx.lineWidth = 1.2;
+          ctx.ellipse(rx, soilY + 2, 6, 2, 0, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+      }
+      ctx.globalAlpha = 1.0;
+    }
+
+    // --- PHASE 4: CHIM BỒ CÂU TRẮNG 🕊️ BAY LƯỢN QUANH CÂY (p: 0.70 -> 1.0) ---
+    if (p >= 0.70) {
+      const doveAlpha = p < 0.80 ? (p - 0.70) * 10 : (p > 0.95 ? (1.0 - p) * 20 : 1.0);
+      ctx.globalAlpha = Math.max(0, Math.min(1.0, doveAlpha));
+
+      const doves = [
+        { angle: tick * 2.2, radiusX: w * 0.26, radiusY: h * 0.12, cy: h * 0.28, phase: 0 },
+        { angle: tick * 2.2 + Math.PI, radiusX: w * 0.32, radiusY: h * 0.15, cy: h * 0.32, phase: 0.5 }
+      ];
+
+      doves.forEach(d => {
+        const dx = w * 0.50 + Math.cos(d.angle) * d.radiusX;
+        const dy = d.cy + Math.sin(d.angle * 2) * (d.radiusY * 0.5);
+        const flap = Math.sin(tick * 16 + d.phase) * 7;
+        const heading = Math.cos(d.angle) > 0 ? 1 : -1;
+
+        // Vẽ chim bồ câu trắng
+        ctx.fillStyle = '#FFFFFF';
+        ctx.beginPath();
+        // Thân chim
+        ctx.ellipse(dx, dy, 10, 5, heading * 0.2, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Cánh chim đang vỗ
+        ctx.beginPath();
+        ctx.moveTo(dx - heading * 2, dy);
+        ctx.lineTo(dx - heading * 6, dy - 12 + flap);
+        ctx.lineTo(dx + heading * 5, dy);
+        ctx.closePath();
+        ctx.fill();
+
+        // Mỏ vàng
+        ctx.fillStyle = '#F59E0B';
+        ctx.beginPath();
+        ctx.moveTo(dx + heading * 10, dy - 1);
+        ctx.lineTo(dx + heading * 14, dy);
+        ctx.lineTo(dx + heading * 10, dy + 2);
+        ctx.fill();
+
+        // Vệt bụi sáng thiên đàng phía sau chim
+        ctx.fillStyle = 'rgba(254, 240, 138, 0.6)';
+        ctx.beginPath();
+        ctx.arc(dx - heading * 12, dy + Math.sin(tick * 5) * 3, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      ctx.globalAlpha = 1.0;
+    }
   }
 
   // 14. ANGEL HOLY FIRE ANIMATION
@@ -893,22 +1026,22 @@ document.getElementById('btn-close-pond-modal').addEventListener('click', () => 
   document.getElementById('pond-modal').style.display = 'none';
 });
 
-// TRIGGER WATERING ANIMATION
+// TRIGGER WATERING ANIMATION (Thiên Sứ Đổ Nước & Mưa Rào 8 Giây)
 function triggerWatering() {
   audio.playBell(528);
   audio.playWaterDrop();
   isWateringAnim = true;
   wateringProgress = 0;
   rockDissolve = 0;
-  showBanner('Thiên Sứ giáng lâm cầm bình ngọc đổ Nước Hằng Sống...');
+  showBanner('Thiên Sứ giáng lâm cầm bình vàng đổ Nước Hằng Sống...');
 
   const startTime = Date.now();
-  const duration = 4000;
+  const duration = 8000; // 8 giây trút mưa tươi mát & chim bồ câu bay
 
   function step() {
     const elapsed = Date.now() - startTime;
     wateringProgress = Math.min(1.0, elapsed / duration);
-    rockDissolve = wateringProgress; // rocks dissolve progressively
+    rockDissolve = wateringProgress; // Sỏi đá tan biến dần theo nước
 
     if (elapsed < duration) {
       requestAnimationFrame(step);
@@ -920,7 +1053,7 @@ function triggerWatering() {
         uData.isNegative = false;
         store.saveUserData(currentUser.username, uData);
       }
-      showBanner('Dòng nước đã làm tan biến toàn bộ sỏi đá cản rễ!');
+      showBanner('Cơn mưa sự sống đã làm tươi mới cây và tan biến mọi sỏi đá!');
     }
   }
   requestAnimationFrame(step);
@@ -955,28 +1088,35 @@ function triggerHolyFire() {
   requestAnimationFrame(step);
 }
 
-// QUICK ACTIONS
-document.getElementById('btn-toggle-weeds').addEventListener('click', () => {
-  if (!currentUser) return;
-  const uData = store.getUserData(currentUser.username);
-  uData.isNegative = !uData.isNegative;
-  rockDissolve = uData.isNegative ? 0 : 1;
-  store.saveUserData(currentUser.username, uData);
-  showBanner(uData.isNegative ? 'Đã xuất hiện sỏi đá, cỏ lùng và bụi gai!' : 'Mảnh đất lòng đã được giải phóng!');
-});
+// SAFE QUICK ACTIONS (Nếu có)
+const btnToggleWeeds = document.getElementById('btn-toggle-weeds');
+if (btnToggleWeeds) {
+  btnToggleWeeds.addEventListener('click', () => {
+    if (!currentUser) return;
+    const uData = store.getUserData(currentUser.username);
+    uData.isNegative = !uData.isNegative;
+    rockDissolve = uData.isNegative ? 0 : 1;
+    store.saveUserData(currentUser.username, uData);
+  });
+}
 
-document.getElementById('btn-add-water').addEventListener('click', () => {
-  if (!currentUser) return;
-  const uData = store.getUserData(currentUser.username);
-  uData.waterDrops += 100;
-  store.saveUserData(currentUser.username, uData);
-  updateHeaderDrops();
-  audio.playWaterDrop();
-  showBanner('Đã nhận thêm 100 Giọt Nước Sự Sống!');
-});
+const btnAddWater = document.getElementById('btn-add-water');
+if (btnAddWater) {
+  btnAddWater.addEventListener('click', () => {
+    if (!currentUser) return;
+    const uData = store.getUserData(currentUser.username);
+    uData.waterDrops += 100;
+    store.saveUserData(currentUser.username, uData);
+    updateHeaderDrops();
+    audio.playWaterDrop();
+  });
+}
 
-document.getElementById('btn-test-watering').addEventListener('click', triggerWatering);
-document.getElementById('btn-test-fire').addEventListener('click', triggerHolyFire);
+const btnTestWatering = document.getElementById('btn-test-watering');
+if (btnTestWatering) btnTestWatering.addEventListener('click', triggerWatering);
+
+const btnTestFire = document.getElementById('btn-test-fire');
+if (btnTestFire) btnTestFire.addEventListener('click', triggerHolyFire);
 
 document.getElementById('btn-pond-trigger').addEventListener('click', openPondModal);
 
@@ -1012,13 +1152,44 @@ function showBanner(msg) {
   const b = document.getElementById('animation-banner');
   b.innerText = msg;
   b.style.display = 'block';
-  setTimeout(() => { b.style.display = 'none'; }, 3500);
+  setTimeout(() => { b.style.display = 'none'; }, 4000);
 }
 
 function updateHeaderDrops() {
   if (!currentUser) return;
   const uData = store.getUserData(currentUser.username);
   document.getElementById('header-drops-count').innerText = uData.waterDrops;
+}
+
+// KIỂM TRA ĐIỀU KIỆN XUẤT HIỆN SỎI ĐÁ & CỎ LÙNG (Ít nhất 6 bài nan đề)
+function updateNegativeState(uData) {
+  if (!uData) return false;
+  let count = 0;
+  const distressKeywords = ['lo', 'sợ', 'buồn', 'mỏi mệt', 'kiệt sức', 'áp lực', 'tội lỗi', 'dằn vặt', 'bế tắc', 'cô đơn', 'đau', 'nản'];
+
+  if (uData.journals) {
+    for (const j of uData.journals) {
+      if (j.mood === 'Lo lắng' || j.mood === 'Mỏi mệt') {
+        count++;
+      } else {
+        const text = ((j.title || '') + ' ' + (j.content || '')).toLowerCase();
+        if (distressKeywords.some(k => text.includes(k))) count++;
+      }
+    }
+  }
+
+  if (uData.chats) {
+    for (const c of uData.chats) {
+      if (c.role === 'user') {
+        const text = (c.text || '').toLowerCase();
+        if (distressKeywords.some(k => text.includes(k))) count++;
+      }
+    }
+  }
+
+  // Phải có ít nhất 6 bài / lượt tâm sự nan đề mới tích tụ sỏi đá
+  uData.isNegative = count >= 6;
+  return uData.isNegative;
 }
 
 // 4. NAVIGATION TABS
@@ -1070,7 +1241,7 @@ function renderCoreNeedList() {
   });
 }
 
-// 6. TAB 3: JOURNAL
+// 6. TAB 3: JOURNAL (VIẾT NHẬT KÝ +20 GIỌT NƯỚC)
 let selectedMood = 'Bình an';
 document.querySelectorAll('.mood-btn').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -1088,7 +1259,7 @@ document.getElementById('btn-save-journal').addEventListener('click', () => {
     return;
   }
   const uData = store.getUserData(currentUser.username);
-  uData.waterDrops += 1;
+  uData.waterDrops = (uData.waterDrops || 0) + 20; // +20 Giọt nước
   if (!uData.journals) uData.journals = [];
   uData.journals.unshift({
     title,
@@ -1096,13 +1267,14 @@ document.getElementById('btn-save-journal').addEventListener('click', () => {
     mood: selectedMood,
     date: new Date().toLocaleDateString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' })
   });
+  updateNegativeState(uData);
   store.saveUserData(currentUser.username, uData);
   document.getElementById('journal-title').value = '';
   document.getElementById('journal-content').value = '';
   updateHeaderDrops();
   audio.playBell(528);
   renderJournals();
-  alert('Đã lưu vào nhật ký (+1 Giọt Nước)!');
+  alert('Đã lưu vào nhật ký (+20 Giọt Nước Sự Sống)!');
 });
 
 function renderJournals() {
@@ -1129,7 +1301,7 @@ function renderJournals() {
   });
 }
 
-// 7. TAB 4: CHAT
+// 7. TAB 4: TÂM SỰ VỚI CHÚA (TÂM SỰ +20 GIỌT NƯỚC)
 function renderChat() {
   const box = document.getElementById('chat-messages');
   box.innerHTML = '';
@@ -1156,7 +1328,10 @@ async function sendChatMessage() {
   input.value = '';
 
   const uData = store.getUserData(currentUser.username);
+  uData.waterDrops = (uData.waterDrops || 0) + 20; // +20 Giọt nước khi tâm sự
   uData.chats.push({ role: 'user', text });
+  updateNegativeState(uData);
+  updateHeaderDrops();
   renderChat();
 
   // Temporary thinking indicator
@@ -1223,6 +1398,11 @@ function renderSettings() {
   document.getElementById('settings-display-name').value = currentUser.displayName || currentUser.username;
   document.getElementById('settings-gemini-key').value = store.getGeminiKey();
 
+  const soundToggle = document.getElementById('settings-sound-toggle');
+  if (soundToggle) {
+    soundToggle.checked = store.isSoundEnabled();
+  }
+
   const adminCard = document.getElementById('admin-management-card');
   if (currentUser.isAdmin) {
     adminCard.style.display = 'block';
@@ -1230,6 +1410,13 @@ function renderSettings() {
   } else {
     adminCard.style.display = 'none';
   }
+}
+
+const soundToggleEl = document.getElementById('settings-sound-toggle');
+if (soundToggleEl) {
+  soundToggleEl.addEventListener('change', (e) => {
+    store.setSoundEnabled(e.target.checked);
+  });
 }
 
 function renderAdminMemberList() {

@@ -83,17 +83,9 @@
       <main class="content-viewport">
         <!-- TAB 1: CÂY SỰ SỐNG -->
         <section id="tab-tree" class="tab-pane active">
-          <!-- QUICK TEST BAR -->
-          <div class="quick-action-bar">
-            <button id="btn-toggle-weeds" class="action-chip">🥀 Có Gai/Cỏ</button>
-            <button id="btn-add-water" class="action-chip">💧 +100 Nước</button>
-            <button id="btn-test-watering" class="action-chip gold">👼 Đổ Bình Nước</button>
-            <button id="btn-test-fire" class="action-chip fire">🔥 Thả Hòn Lửa</button>
-          </div>
-
           <!-- SACRED CANVAS -->
           <div class="tree-growth-status" style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.06); padding:8px 14px; border-radius:12px; margin-bottom:10px; font-size:0.85rem; border:1px solid rgba(255,255,255,0.08);">
-            <span id="tree-stage-name" style="font-weight:600; color:#FDE047;">🌱 Mầm Non Sự Sống (Cấp 1)</span>
+            <span id="tree-stage-name" style="font-weight:600; color:#FDE047;">🌱 Mầm Non Tĩnh Nguyện (Cấp 1)</span>
             <span id="tree-root-count" style="color:#38BDF8; font-weight:500;">🪵 3 Rễ Đức Tin</span>
           </div>
           <div class="canvas-wrapper">
@@ -147,28 +139,28 @@
             </div>
             <input type="text" id="journal-title" placeholder="Tiêu đề nhật ký..." class="text-input">
             <textarea id="journal-content" placeholder="Ghi lại những điều Chúa soi sáng, nỗi lòng của bạn hôm nay..." class="text-area" rows="4"></textarea>
-            <button id="btn-save-journal" class="btn-primary">Lưu Vào Nhật Ký (+1 Giọt Nước)</button>
+            <button id="btn-save-journal" class="btn-primary">Lưu Vào Nhật Ký (+20 Giọt Nước)</button>
           </div>
 
           <h3 class="section-title" style="margin-top: 20px;">Dòng Thời Gian Nhật Ký</h3>
           <div id="journal-list" class="journal-list"></div>
         </section>
 
-        <!-- TAB 4: PHÒNG CẦU NGUYỆN & AI AN ỦI -->
+        <!-- TAB 4: TÂM SỰ VỚI CHÚA -->
         <section id="tab-prayer" class="tab-pane">
           <div class="prayer-chat-container">
             <div class="chat-intro-banner">
               <span class="intro-icon">🕊️</span>
               <div>
-                <strong>Người Đồng Hành Tĩnh Nguyện</strong>
-                <p>Kinh Thánh Bản 1925 & Lắng Nghe Mọi Nan Đề</p>
+                <strong>Người Đồng Hành Tâm Sự</strong>
+                <p>Lắng Nghe Mọi Nan Đề & Lời Chúa Soi Dẫn (+20 Giọt Nước)</p>
               </div>
             </div>
 
             <div id="chat-messages" class="chat-messages"></div>
 
             <div class="chat-input-row">
-              <input type="text" id="chat-input" placeholder="Tâm sự nỗi lòng hoặc xin câu Kinh Thánh..." autocomplete="off">
+              <input type="text" id="chat-input" placeholder="Tâm sự nỗi lòng của bạn cùng Chúa hôm nay..." autocomplete="off">
               <button id="btn-send-chat" class="btn-send">Gửi</button>
             </div>
           </div>
@@ -184,6 +176,19 @@
               <input type="text" id="settings-display-name" class="text-input">
             </div>
             <button id="btn-save-profile" class="btn-secondary">Lưu Tên Hiển Thị</button>
+          </div>
+
+          <!-- SOUND SETTINGS -->
+          <div class="settings-card">
+            <h3>🔔 Âm Thanh & Tần Số 528Hz</h3>
+            <p class="hint-text">Bật/tắt âm thanh chuông tần số chữa lành 528Hz và tiếng nước chảy.</p>
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-top:10px;">
+              <span>Phát âm thanh chuông 528Hz</span>
+              <label class="switch">
+                <input type="checkbox" id="settings-sound-toggle" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
           </div>
 
           <!-- ADMIN USER MANAGEMENT -->
@@ -232,7 +237,7 @@
         </button>
         <button class="nav-item" data-tab="tab-prayer">
           <span class="nav-icon">🕊️</span>
-          <span class="nav-label">Cầu Nguyện</span>
+          <span class="nav-label">Tâm Sự</span>
         </button>
         <button class="nav-item" data-tab="tab-settings">
           <span class="nav-icon">⚙️</span>
