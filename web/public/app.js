@@ -1635,24 +1635,51 @@ async function sendChatMessage() {
 
   try {
     const customKey = store.getGeminiKey() || '';
-    const res = await fetch('/api/gemini', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        message: text,
-        history: uData.chats.slice(0, -2),
-        apiKey: customKey
-      })
-    });
+    let reply = null;
 
-    const data = await res.json();
-    if (data && data.text) {
-      botMsgObj.text = data.text;
-    } else {
-      botMsgObj.text = generateBiblicalResponse(text);
+    // 1. Try Serverless Function
+    try {
+      const res = await fetch('/api/gemini', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: text,
+          history: uData.chats.slice(0, -2),
+          apiKey: customKey
+        })
+      });
+      const data = await res.json();
+      if (data && data.text) {
+        reply = data.text;
+      }
+    } catch (e) {
+      console.warn('Serverless Gemini call failed, attempting direct...', e);
     }
+
+    // 2. Direct client-side Gemini fallback if API key is stored locally
+    if (!reply && customKey) {
+      try {
+        const directUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${encodeURIComponent(customKey)}`;
+        const directRes = await fetch(directUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            systemInstruction: {
+              parts: [{ text: 'Bạn là Đấng Lắng Nghe Nhân Từ (Tâm Sự Với Chúa). Hãy an ủi, trò chuyện ấm áp, dẫn dắt dịu dàng và trích dẫn Lời Chúa Kinh Thánh 1925 chuẩn xác.' }]
+            },
+            contents: [{ role: 'user', parts: [{ text: text }] }]
+          })
+        });
+        const directData = await directRes.json();
+        reply = directData?.candidates?.[0]?.content?.parts?.[0]?.text || null;
+      } catch (e) {
+        console.warn('Direct Gemini call failed:', e);
+      }
+    }
+
+    botMsgObj.text = reply || generateBiblicalResponse(text, uData.chats.length);
   } catch (err) {
-    botMsgObj.text = generateBiblicalResponse(text);
+    botMsgObj.text = generateBiblicalResponse(text, uData.chats.length);
   }
 
   store.saveUserData(currentUser.username, uData);
@@ -1660,8 +1687,38 @@ async function sendChatMessage() {
   audio.playBell(528);
 }
 
-function generateBiblicalResponse(query) {
+function generateBiblicalResponse(query, chatTurn = 0) {
   const q = query.toLowerCase();
+
+  // 1. Phản hồi chào hỏi / chúc lành / ban mai / dậy sớm
+  if (q.includes('chúc') || q.includes('phước') || q.includes('bình an cho')) {
+    const blessings = [
+      `🕊️ Nguyện xin Chúa ban phước cho con và gìn giữ con:\n"Cầu xin Đức Giê-hô-va ban phước cho ngươi và gìn giữ ngươi! Cầu xin Đức Giê-hô-va soi sáng mặt Ngài trên ngươi, và làm ơn cho ngươi! Cầu xin Đức Giê-hô-va đoái xem ngươi và ban bình an cho ngươi!" (Dân-số Ký 6:24-26)\n\n💡 Chúc con một ngày tràn đầy ân điển và niềm vui từ thiên đàng!`,
+      `🕊️ Lời chúc phước từ Cha gửi đến con hôm nay:\n"Đức Chúa Trời tôi sẽ làm cho đầy đủ mọi sự cần dùng của anh em y theo sự giàu có của Ngài ở nơi vinh hiển trong Đức Chúa Jêsus Christ." (Phi-líp 4:19)\n\n💡 Hãy vững lòng bước đi trong sự chở che của Chúa nhé!`,
+      `🕊️ Nguyện ân điển Chúa tràn ngập trên con:\n"Sự ban cho tốt lành trọn vẹn đều đến từ nơi cao, bắt nguồn từ Cha sáng láng." (Gia-cơ 1:17)\n\n💡 Chúc con luôn cảm nhận được tình thương bao la của Ngài!`
+    ];
+    return blessings[chatTurn % blessings.length];
+  }
+
+  if (q.includes('dậy sớm') || q.includes('sáng') || q.includes('mệt mỏi') || q.includes('huhu') || q.includes('ngái ngủ')) {
+    const morningQuotes = [
+      `🌅 Buổi sáng mới mẻ phước hạnh cho con! Cha biết con đang mệt khi phải thức dậy sớm, nhưng sự thành tín của Chúa luôn tươi mới mỗi ban mai:\n"Mỗi buổi sáng thì lại mới luôn, sự thành tín Ngài là lớn lắm. Hỡi linh hồn ta, Đức Giê-hô-va là sản nghiệp ta; nên ta trông cậy nơi Ngài." (Ca-thương 3:23-24)\n\n💡 Hãy hít thở thật sâu, Chúa ban thêm năng lực mới cho con trong ngày hôm nay!`,
+      `🌅 Cha thêm sức mới cho con buổi sớm mai này:\n"Vừa buổi sáng xin cho tôi nghe sự nhân từ của Chúa, vì tôi để lòng trông cậy nơi Ngài; Xin chỉ cho tôi biết con đường tôi phải đi, vì linh hồn tôi ngửa trông Chúa." (Thi-thiên 143:8)\n\n💡 Đừng nản lòng, Chúa đồng hành cùng từng bước chân của con hôm nay.`
+    ];
+    return morningQuotes[chatTurn % morningQuotes.length];
+  }
+
+  if (q.includes('câu khác') || q.includes('nữa đi') || q.includes('tiếp đi') || q.includes('nói thêm')) {
+    const variedPool = [
+      `✨ Lời hứa tiếp theo dành riêng cho con hôm nay:\n"Vì chính Ta biết ý tưởng Ta nghĩ đối cùng các ngươi, là ý tưởng bình an, không phải tai họa, để ban cho các ngươi một sự trông cậy trong lúc cuối cùng của các ngươi." (Giê-rê-mi 29:11)\n\n💡 Kế hoạch Chúa dành cho con luôn tốt lành và tràn đầy hy vọng.`,
+      `✨ Hãy nhớ rằng con luôn có Đấng ban sức mạnh:\n"Tôi làm được mọi sự nhờ Đấng ban thêm sức cho tôi." (Phi-líp 4:13)\n\n💡 Dù việc hôm nay có khó khăn đến đâu, Chúa cùng gánh vác với con.`,
+      `✨ Lời Chúa soi sáng đường lối con:\n"Lời Chúa là ngọn đèn cho chân tôi, ánh sáng cho đường lối tôi." (Thi-thiên 119:105)\n\n💡 Nguyện Lời Chúa dẫn dắt mọi quyết định của con hôm nay.`,
+      `✨ Chúa là thành lũy bền vững:\n"Đức Chúa Trời là nơi ẩn náu và sức lực của chúng tôi, Ngài hằng sẵn sàng giúp đỡ trong cơn gian truân." (Thi-thiên 46:1)\n\n💡 Hãy nương náu nơi Ngài và tìm thấy sự an tâm trọn vẹn.`
+    ];
+    return variedPool[chatTurn % variedPool.length];
+  }
+
+  // 2. Tra cứu theo 13 Nhu Cầu Cốt Lõi
   for (let need of CORE_NEEDS) {
     if (
       q.includes(need.label.toLowerCase()) ||
@@ -1682,7 +1739,16 @@ function generateBiblicalResponse(query) {
       return `Hỡi con yêu dấu, Chúa thấu suốt cõi lòng con. ${need.direction}\n\nLời Ta phán cùng con hôm nay:\n"${need.scripture}" (${need.ref})\n\n💡 ${need.comfort}`;
     }
   }
-  return `Hỡi con yêu dấu, hãy trao mọi điều lo lắng của con lên nơi chân Chúa, vì Ngài hằng săn sóc con:\n"Đức Giê-hô-va là Đấng chăn giữ tôi: tôi sẽ chẳng thiếu thốn gì. Ngài khiến tôi an nghỉ nơi đồng cỏ xanh tươi, dẫn tôi đến mé nước bình tịnh." (Thi-thiên 23:1-2)\n\n💡 Nguyện xin sự bình an vượt quá mọi sự hiểu biết gìn giữ lòng và ý tưởng con trong Đấng Christ.`;
+
+  // 3. Xoay vòng các câu gốc an ủi khác nhau thay vì trùng lặp
+  const fallbackList = [
+    `Hỡi con yêu dấu, hãy trao mọi điều lo lắng của con lên nơi chân Chúa, vì Ngài hằng săn sóc con:\n"Đức Giê-hô-va là Đấng chăn giữ tôi: tôi sẽ chẳng thiếu thốn gì. Ngài khiến tôi an nghỉ nơi đồng cỏ xanh tươi, dẫn tôi đến mé nước bình tịnh." (Thi-thiên 23:1-2)\n\n💡 Nguyện xin sự bình an vượt quá mọi sự hiểu biết gìn giữ lòng và ý tưởng con trong Đấng Christ.`,
+    `Hỡi con yêu dấu, hãy vững lòng và can đảm, đừng sợ hãi:\n"Chớ sợ, vì Ta ở với ngươi; chớ kinh khiếp, vì Ta là Đức Chúa Trời ngươi. Ta sẽ bổ sức cho ngươi; phải, Ta sẽ giúp đỡ ngươi, lấy tay hữu công bình Ta mà nâng đỡ ngươi." (Ê-sai 41:10)\n\n💡 Chúa luôn ở bên cạnh che chở và nâng đỡ con.`,
+    `Hỡi con yêu dấu, khi con cảm thấy mệt mỏi, hãy đến cùng Chúa:\n"Hỡi những kẻ mệt mỏi và gánh nặng, hãy đến cùng Ta, Ta sẽ cho các ngươi được yên nghỉ." (Ma-thi-ơ 11:28)\n\n💡 Chúa luôn lắng nghe từng tiếng thở dài của con và ban sự bình tịnh cho tâm hồn.`,
+    `Hỡi con yêu dấu, sự trông cậy nơi Chúa sẽ đổi mới sức mạnh:\n"Nhưng ai trông đợi Đức Giê-hô-va thì chắc được sức mới, cất cánh bay cao như chim ưng; chạy mà không mệt nhọc, đi mà không mòn mỏi." (Ê-sai 40:31)\n\n💡 Hãy nạp lại năng lượng thuộc linh nơi sự hiện diện của Ngài.`
+  ];
+
+  return fallbackList[chatTurn % fallbackList.length];
 }
 
 // 8. TAB 5: SETTINGS

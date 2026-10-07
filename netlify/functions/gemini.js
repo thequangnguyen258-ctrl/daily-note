@@ -85,27 +85,37 @@ QUY TẮC BẮT BUỘC:
       }
     });
 
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${effectiveKey}`;
+    const callGemini = async (modelName) => {
+      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${effectiveKey}`;
+      return new Promise((resolve, reject) => {
+        const req = https.request(geminiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(geminiRequestBody)
+          }
+        }, (res) => {
+          let data = '';
+          res.on('data', chunk => { data += chunk; });
+          res.on('end', () => resolve({ statusCode: res.statusCode, body: data }));
+        });
 
-    const geminiResponseText = await new Promise((resolve, reject) => {
-      const req = https.request(geminiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': Buffer.byteLength(geminiRequestBody)
-        }
-      }, (res) => {
-        let data = '';
-        res.on('data', chunk => { data += chunk; });
-        res.on('end', () => resolve(data));
+        req.on('error', (e) => reject(e));
+        req.write(geminiRequestBody);
+        req.end();
       });
+    };
 
-      req.on('error', (e) => reject(e));
-      req.write(geminiRequestBody);
-      req.end();
-    });
+    let result = await callGemini('gemini-1.5-flash');
+    let parsed = null;
+    try { parsed = JSON.parse(result.body); } catch {}
 
-    const parsed = JSON.parse(geminiResponseText);
+    if (!parsed?.candidates?.[0]?.content?.parts?.[0]?.text) {
+      // Fallback to gemini-2.0-flash
+      const fallbackResult = await callGemini('gemini-2.0-flash');
+      try { parsed = JSON.parse(fallbackResult.body); } catch {}
+    }
+
     const replyText = parsed?.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (replyText) {
